@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 2026-08-06
+Last updated: 2026-08-06 (corpus: 2 good / 6 bad fixtures)
 
 ## What exists
 

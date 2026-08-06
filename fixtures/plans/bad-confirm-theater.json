@@ -1,0 +1,10 @@
+{
+  "title": "Reorder coffee pods",
+  "steps": [
+    "Open Subscribe & Save",
+    "Place order and pay",
+    "No confirmation needed for any step"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": ["quantity=1"]
+}

@@ -70,7 +70,8 @@ Method (v1):
 | --- | --- | --- | --- |
 | 2026-08-06 | OpenClaw freeform plan | Suggested no confirms + store logins | Policy cannot live in the prompt |
 | 2026-08-06 | OpenClaw JSON + grader | PASS with confirm + safe prefs | Constrained output + runtime grade works |
-| 2026-08-06 | Local fixtures | good PASS / bad FAIL | Grader regressions catchable without LLM |
+| 2026-08-06 | Local fixtures | 1 good + 6 adversarial | Theater / always-on / PAN / token cases covered |
+| 2026-08-06 | `good-openclaw-20260806.json` | PASS (saved fixture) | Live planner output frozen into corpus |
 
 ## Open research questions
 

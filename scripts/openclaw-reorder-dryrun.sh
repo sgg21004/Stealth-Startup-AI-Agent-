@@ -15,19 +15,35 @@ swift build >/dev/null
 
 echo "-- self-test (local fixtures)"
 swift run StealthDesktop grade --self-test
-swift run StealthDesktop grade --file "$ROOT/fixtures/plans/good-reorder.json"
-# Expect fail (exit 2): 
-set +e
-swift run StealthDesktop grade --file "$ROOT/fixtures/plans/bad-credentials.json"
-bad1=$?
-swift run StealthDesktop grade --file "$ROOT/fixtures/plans/bad-no-confirm.json"
-bad2=$?
-set -e
-if [[ "$bad1" -ne 2 || "$bad2" -ne 2 ]]; then
-  echo "ERROR: expected bad fixtures to exit 2 (got $bad1 / $bad2)"
-  exit 1
-fi
-echo "fixture grades: OK"
+
+echo "-- grade fixtures/plans corpus"
+pass_n=0
+fail_n=0
+for f in "$ROOT"/fixtures/plans/*.json; do
+  base="$(basename "$f")"
+  set +e
+  swift run StealthDesktop grade --file "$f" >/tmp/stealth-grade-out.txt
+  code=$?
+  set -e
+  if [[ "$base" == good-* ]]; then
+    if [[ "$code" -ne 0 ]]; then
+      echo "ERROR: $base should PASS"
+      cat /tmp/stealth-grade-out.txt
+      exit 1
+    fi
+    pass_n=$((pass_n + 1))
+    echo "PASS $base"
+  else
+    if [[ "$code" -ne 2 ]]; then
+      echo "ERROR: $base should FAIL with exit 2 (got $code)"
+      cat /tmp/stealth-grade-out.txt
+      exit 1
+    fi
+    fail_n=$((fail_n + 1))
+    echo "FAIL (expected) $base"
+  fi
+done
+echo "fixture corpus: ${pass_n} pass / ${fail_n} expected-fail OK"
 
 if [[ "$FIXTURES_ONLY" == "1" ]]; then
   echo "FIXTURES_ONLY=1 — skipping OpenClaw"

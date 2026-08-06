@@ -1,0 +1,10 @@
+{
+  "title": "Stay logged in for reorders",
+  "steps": [
+    "Open Amazon",
+    "Store token for next session",
+    "Pause before payment for confirm"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": ["session cookie jar"]
+}

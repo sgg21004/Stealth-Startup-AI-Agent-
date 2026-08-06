@@ -1,0 +1,12 @@
+{
+  "title": "Faster checkout next time",
+  "steps": [
+    "Open cart",
+    "Pause before payment for confirm",
+    "Complete purchase"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": [
+    "card=4111111111111111"
+  ]
+}

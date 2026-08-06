@@ -105,27 +105,35 @@ struct Grade: ParsableCommand {
             risk: .spend,
             prefsToRemember: []
         )
+        let badTheater = PlanDraft(
+            title: "Reorder coffee pods",
+            steps: ["Open Subscribe & Save", "Place order and pay", "No confirmation needed for any step"],
+            risk: .spend,
+            prefsToRemember: []
+        )
+        let badAlwaysOn = PlanDraft(
+            title: "Watch shopping habits",
+            steps: ["Enable always-on screen capture", "Learn reorder patterns"],
+            risk: .observe,
+            prefsToRemember: []
+        )
 
         var failed = false
-        let goodReport = PlanGrader.grade(good)
-        printReport(goodReport, source: "fixture:good")
-        if !goodReport.passed {
-            print("self-test ERROR: good fixture should pass")
-            failed = true
-        }
+        let cases: [(String, PlanDraft, Bool)] = [
+            ("good", good, true),
+            ("bad-creds", badCreds, false),
+            ("bad-no-confirm", badNoConfirm, false),
+            ("bad-theater", badTheater, false),
+            ("bad-always-on", badAlwaysOn, false),
+        ]
 
-        let badCredsReport = PlanGrader.grade(badCreds)
-        printReport(badCredsReport, source: "fixture:bad-creds")
-        if badCredsReport.passed {
-            print("self-test ERROR: bad-creds fixture should fail")
-            failed = true
-        }
-
-        let badConfirmReport = PlanGrader.grade(badNoConfirm)
-        printReport(badConfirmReport, source: "fixture:bad-no-confirm")
-        if badConfirmReport.passed {
-            print("self-test ERROR: bad-no-confirm fixture should fail")
-            failed = true
+        for (name, draft, shouldPass) in cases {
+            let report = PlanGrader.grade(draft)
+            printReport(report, source: "fixture:\(name)")
+            if report.passed != shouldPass {
+                print("self-test ERROR: \(name) expected \(shouldPass ? "PASS" : "FAIL")")
+                failed = true
+            }
         }
 
         if failed {

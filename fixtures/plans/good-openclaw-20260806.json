@@ -1,0 +1,17 @@
+{
+  "title": "Reorder Items from Amazon Subscribe & Save",
+  "steps": [
+    "Open Safari and go to the Amazon website.",
+    "Log in if prompted.",
+    "Find the product you want to reorder on your Subscribe & Save list or by searching for it.",
+    "Click 'Edit' next to the product.",
+    "Select 'Same as last time' option if available. If not, manually set the quantity and delivery date.",
+    "Review the order details and confirm before proceeding to payment."
+  ],
+  "risk": "spend",
+  "prefs_to_remember": [
+    "vendor",
+    "quantity",
+    "cadence"
+  ]
+}

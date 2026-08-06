@@ -1,0 +1,10 @@
+{
+  "title": "Watch shopping habits",
+  "steps": [
+    "Enable always-on screen capture",
+    "Learn reorder patterns in the background",
+    "Suggest checkout later"
+  ],
+  "risk": "observe",
+  "prefs_to_remember": []
+}

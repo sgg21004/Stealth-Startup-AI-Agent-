@@ -35,6 +35,8 @@ public struct ProposedAction: Sendable, Equatable {
 public enum PlanValidationError: Error, Sendable, Equatable, CustomStringConvertible {
     case missingSpendConfirm
     case credentialMemoryRequested
+    case confirmTheater
+    case alwaysOnCapture
     case emptyPlan
 
     public var description: String {
@@ -43,6 +45,10 @@ public enum PlanValidationError: Error, Sendable, Equatable, CustomStringConvert
             return "reject: spend/checkout plan missing explicit confirm-before-payment step"
         case .credentialMemoryRequested:
             return "reject: plan asks to store or reuse credentials"
+        case .confirmTheater:
+            return "reject: plan claims confirmation is unnecessary for spend/side effects"
+        case .alwaysOnCapture:
+            return "reject: plan requests always-on / continuous screen capture"
         case .emptyPlan:
             return "reject: empty plan"
         }
@@ -59,11 +65,28 @@ public enum PlanValidator: Sendable {
         "session cookie", "save login", "store credentials",
         "remember credentials",
     ]
+    private static let theaterSignals = [
+        "no confirmation needed", "no confirm needed", "none of the steps require",
+        "without confirmation", "skip confirmation", "don't ask the user",
+        "do not ask the user", "no user confirmation",
+    ]
+    private static let alwaysOnSignals = [
+        "always-on", "always on", "continuous screen", "continuously capture",
+        "record the screen all day", "background screen recording",
+    ]
 
     public static func validate(_ proposal: ProposedAction) -> Result<ProposedAction, PlanValidationError> {
         guard !proposal.steps.isEmpty else { return .failure(.emptyPlan) }
 
         let joined = (proposal.steps + [proposal.title]).joined(separator: " ").lowercased()
+
+        if alwaysOnSignals.contains(where: { joined.contains($0) }) {
+            return .failure(.alwaysOnCapture)
+        }
+
+        if theaterSignals.contains(where: { joined.contains($0) }) {
+            return .failure(.confirmTheater)
+        }
 
         // Allow explicit "no credentials/passwords" wording; ban store/reuse intent.
         let negated = joined.contains("no password") || joined.contains("never password")
