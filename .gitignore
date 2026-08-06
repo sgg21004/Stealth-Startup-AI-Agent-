@@ -1,10 +1,10 @@
 .DS_Store
 /.build
-/Packages
-/*.xcodeproj
+# SPM may create a capital-P checkouts dir; do NOT ignore ./packages (source)
+.swiftpm/
+*.xcodeproj
 xcuserdata/
 DerivedData/
-.swiftpm/
 *.swp
 .env
 .env.*
