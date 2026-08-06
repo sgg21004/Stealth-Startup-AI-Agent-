@@ -4,4 +4,6 @@ cd "$(dirname "$0")/.."
 swift package resolve
 swift build
 swift run StealthDesktop status
-swift run StealthDesktop session --confirm
+swift run StealthDesktop policy
+swift run StealthDesktop session
+swift run StealthDesktop session --live --confirm

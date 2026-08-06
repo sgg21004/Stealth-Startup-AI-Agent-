@@ -30,6 +30,7 @@ Or: `./scripts/dev.sh`
 | Architecture | [docs/eng/technical-architecture.md](docs/eng/technical-architecture.md) |
 | Setup | [docs/eng/setup.md](docs/eng/setup.md) |
 | Commands | [docs/eng/commands.md](docs/eng/commands.md) |
+| Security & memory | [docs/eng/security-memory.md](docs/eng/security-memory.md) |
 ## Repo layout
 
 ```

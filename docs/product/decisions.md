@@ -13,3 +13,6 @@ Dated locks. Newer wins if conflict.
 | 2026-08-06 | Host: native Swift; SPM stub first | Full `.app` when Xcode installed |
 | 2026-08-06 | Models: cloud later; heuristic brain now | Ship loop before model routing |
 | 2026-08-06 | No web frontend in v1 | Can add marketing/app site later |
+| 2026-08-06 | Security & memory are core infra | See `docs/eng/security-memory.md`; models are untrusted planners |
+| 2026-08-06 | Spend/send/delete/auth always confirm | No “skip payment confirm” in v1 |
+| 2026-08-06 | Never store credentials or raw payment secrets | Prefs/playbooks only after confirm; on-device |

@@ -13,14 +13,15 @@ swift package resolve
 # build
 swift build
 
-# status
+# status / policy
 swift run StealthDesktop status
+swift run StealthDesktop policy
 
-# one stub attention session (no confirm)
+# dry-run session (default — no playbook write)
 swift run StealthDesktop session
 
-# stub session + auto-confirm (records playbook)
-swift run StealthDesktop session --confirm
+# live + confirm (records playbook after gates)
+swift run StealthDesktop session --live --confirm
 
 # all of the above smoke path
 ./scripts/dev.sh
@@ -73,6 +74,7 @@ open ~/Projects/stealth-startup
 | Roadmap | `docs/product/roadmap.md` |
 | Architecture | `docs/eng/technical-architecture.md` |
 | Setup | `docs/eng/setup.md` |
+| Security & memory | `docs/eng/security-memory.md` |
 | This file | `docs/eng/commands.md` |
 | Host code | `apps/desktop/Sources/StealthDesktop/` |
 | Packages | `packages/*` |

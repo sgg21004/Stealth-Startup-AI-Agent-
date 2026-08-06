@@ -11,7 +11,7 @@ struct StealthDesktop: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "StealthDesktop",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
-        subcommands: [Session.self, Status.self]
+        subcommands: [Session.self, Status.self, Policy.self]
     )
 }
 
@@ -26,16 +26,34 @@ struct Status: ParsableCommand {
         print("platform: macOS only")
         print("vertical: browser reorder")
         print("sensing: hotkey session (stub)")
-        print("models: cloud later; heuristic brain now")
+        print("policy: security-memory enforced in Behavior/Agent/Actions")
+        print("default session mode: dry-run")
+    }
+}
+
+struct Policy: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        abstract: "Show security/memory hard rules."
+    )
+
+    func run() {
+        print("never-store: passwords, tokens, cookies, cards, CVV, SSN")
+        print("always-confirm: spend, send, delete, auth")
+        print("memory: on-device prefs/playbooks after confirmed success only")
+        print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
+        print("doc: docs/eng/security-memory.md")
     }
 }
 
 struct Session: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        abstract: "Run one opt-in attention session (stub loop)."
+        abstract: "Run one opt-in attention session (dry-run by default)."
     )
 
-    @Flag(name: .long, help: "Auto-confirm the proposed action (dev only).")
+    @Flag(name: .long, help: "Record playbook after policy checks (still requires --confirm for spend).")
+    var live: Bool = false
+
+    @Flag(name: .long, help: "User confirm for gated actions (spend/send/delete/auth).")
     var confirm: Bool = false
 
     func run() async throws {
@@ -45,7 +63,21 @@ struct Session: AsyncParsableCommand {
         let runtime = ActionRuntime()
         let store = BehaviorStore()
 
-        await store.upsert(preference: Preference(key: "preferred_vendor", value: "Amazon Subscribe & Save"))
+        // Allowed pref
+        _ = try await store.upsert(
+            preference: Preference(key: "preferred_vendor", value: "Amazon Subscribe & Save")
+        )
+
+        // Demonstrate never-store enforcement
+        do {
+            _ = try await store.upsert(
+                preference: Preference(key: "amazon_password", value: "demo-should-fail")
+            )
+            print("policy: ERROR never-store failed to block password key")
+        } catch {
+            print("policy: blocked secret memory write (\(error))")
+        }
+
         await sensor.startSession()
         defer {
             Task { await sensor.stopSession() }
@@ -55,34 +87,50 @@ struct Session: AsyncParsableCommand {
         let prefs = await store.allPreferences()
         let pack = assembler.assemble(from: snapshot, prefsHints: prefs.map(\.value))
 
-        print("session:on app=\(pack.app)")
+        print("session:on app=\(pack.app) mode=\(live ? "live" : "dry-run")")
         print("context: \(pack.summary)")
 
-        guard let proposal = brain.propose(from: pack, preferences: prefs) else {
-            print("proposal: none")
+        let proposal: ProposedAction
+        switch brain.propose(from: pack, preferences: prefs) {
+        case .failure(let err):
+            print("proposal: \(err)")
             return
+        case .success(let value):
+            proposal = value
         }
 
-        print("proposal: \(proposal.title)")
+        print("proposal: \(proposal.title) risk=\(proposal.risk.rawValue)")
         for (i, step) in proposal.steps.enumerated() {
             print("  \(i + 1). \(step)")
         }
         print("needsConfirm: \(proposal.needsConfirm)")
 
+        // Bad plan demo (what OpenClaw incorrectly suggested earlier)
+        let bad = ProposedAction(
+            title: "Reorder and save login credentials",
+            steps: ["Open Amazon", "Reuse password", "Place order"],
+            risk: .spend
+        )
+        if case .failure(let err) = PlanValidator.validate(bad) {
+            print("scrutiny: rejected untrusted plan (\(err))")
+        }
+
         let outcome = runtime.execute(
-            steps: proposal.steps,
-            name: proposal.title,
-            confirmed: confirm
+            proposal: proposal,
+            confirmed: confirm,
+            dryRun: !live
         )
 
         switch outcome {
-        case .denied:
-            print("outcome: denied (pass --confirm to record playbook in stub mode)")
+        case .denied(let reason):
+            print("outcome: denied (\(reason))")
         case .dryRun(let steps):
-            print("outcome: dry-run \(steps.count) steps")
+            print("outcome: dry-run \(steps.count) steps (pass --live --confirm to record)")
         case .confirmedAndRecorded(let playbook):
             await store.save(playbook: playbook)
             print("outcome: recorded playbook '\(playbook.name)' (\(playbook.steps.count) steps)")
+        case .policyRejected(let reason):
+            print("outcome: policy-rejected (\(reason))")
         }
     }
 }

@@ -47,7 +47,7 @@ let package = Package(
         ),
         .target(
             name: "Actions",
-            dependencies: ["Behavior"],
+            dependencies: ["Behavior", "Agent"],
             path: "packages/Actions/Sources/Actions"
         ),
         // Re-enable after installing full Xcode (CLT has no XCTest / Swift Testing):

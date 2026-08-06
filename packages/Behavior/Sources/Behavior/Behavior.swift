@@ -24,25 +24,68 @@ public struct Playbook: Sendable, Equatable, Codable, Identifiable {
     }
 }
 
-/// On-device store for prefs + playbooks. File-backed stub for v1.
+public enum MemoryWriteError: Error, Sendable, Equatable {
+    case neverStoreKey(String)
+    case neverStoreValue
+}
+
+/// Hard bans from docs/eng/security-memory.md
+public enum MemoryPolicy: Sendable {
+    private static let bannedKeyFragments = [
+        "password", "passwd", "passkey", "secret", "token", "cookie",
+        "session", "credential", "api_key", "apikey", "auth",
+        "card", "cvv", "ssn", "bank",
+    ]
+
+    private static let bannedValuePatterns = [
+        "password", "passwd", "sk-", "Bearer ", "cvv",
+    ]
+
+    public static func validate(preference: Preference) -> Result<Preference, MemoryWriteError> {
+        let key = preference.key.lowercased()
+        if bannedKeyFragments.contains(where: { key.contains($0) }) {
+            return .failure(.neverStoreKey(preference.key))
+        }
+        let value = preference.value
+        if bannedValuePatterns.contains(where: { value.localizedCaseInsensitiveContains($0) }) {
+            return .failure(.neverStoreValue)
+        }
+        // Crude PAN-looking digit runs (13–19 digits)
+        let digits = value.filter(\.isNumber)
+        if digits.count >= 13 && digits.count <= 19 {
+            return .failure(.neverStoreValue)
+        }
+        return .success(preference)
+    }
+}
+
+/// On-device store for prefs + playbooks. Enforces never-store policy on write.
 public actor BehaviorStore {
     private var preferences: [Preference] = []
     private var playbooks: [Playbook] = []
 
     public init() {}
 
-    public func upsert(preference: Preference) {
-        if let idx = preferences.firstIndex(where: { $0.key == preference.key }) {
-            preferences[idx] = preference
+    @discardableResult
+    public func upsert(preference: Preference) throws -> Preference {
+        let validated = try MemoryPolicy.validate(preference: preference).get()
+        if let idx = preferences.firstIndex(where: { $0.key == validated.key }) {
+            preferences[idx] = validated
         } else {
-            preferences.append(preference)
+            preferences.append(validated)
         }
+        return validated
     }
 
     public func allPreferences() -> [Preference] {
         preferences
     }
 
+    public func deletePreference(key: String) {
+        preferences.removeAll { $0.key == key }
+    }
+
+    /// Only call after a confirmed successful run.
     public func save(playbook: Playbook) {
         playbooks.append(playbook)
     }
