@@ -7,3 +7,5 @@ People already point at what they care about with the mouse cursor. Chat-side ag
 **Deeper bet:** the durable company is **agent infrastructure for the future** — sense → memory → plan → act — with **security and scrutiny as the research edge**. Models are untrusted planners. Runtime policy decides what may be remembered and what may run.
 
 Reorder is the proving ground. Safe memory + enforced action gates are the asset.
+
+**Read first:** [docs/eng/security-memory.md](../eng/security-memory.md) · [docs/eng/security-research.md](../eng/security-research.md)

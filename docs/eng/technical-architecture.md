@@ -61,12 +61,14 @@ Desktop AI agent tied to the **system cursor** and screen context, with a behavi
 
 ## Trust & safety
 
+**Canonical policy:** [security-memory.md](./security-memory.md) · **Research:** [security-research.md](./security-research.md) · **Code map:** [security-code-map.md](./security-code-map.md)
+
 | Class | Default |
 | --- | --- |
-| Read screen / suggest | Allowed when sensing is on |
+| Read screen / suggest | Allowed in hotkey session |
 | Click / fill non-sensitive | Confirm first N times, then optional auto |
 | Spend / send / delete / auth | Always confirm |
-| Credentials | Never store raw secrets in prompts or logs |
+| Credentials | Never store; redact; planner plans graded |
 
 ## Repo layout (scaffolded)
 

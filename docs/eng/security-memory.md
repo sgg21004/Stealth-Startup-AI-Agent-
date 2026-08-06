@@ -1,8 +1,10 @@
-# Security & memory (v1)
+# Security & memory (v1) — policy law
 
-This is core product infrastructure, not a later hardening pass. The model may propose unsafe plans; **runtime policy must make unsafe execution impossible**.
+> **This is the biggest product surface.**  
+> Models may propose anything. Runtime must make unsafe memory writes and unsafe actions impossible.  
+> Research framing: [security-research.md](./security-research.md) · Code map: [security-code-map.md](./security-code-map.md)
 
-## Threat model (what we’re defending against)
+## Threat model
 
 | Threat | Example | Mitigation |
 | --- | --- | --- |
@@ -11,6 +13,7 @@ This is core product infrastructure, not a later hardening pass. The model may p
 | Poisoned memory | Bad pref causes wrong reorder forever | User-visible prefs; easy edit/delete |
 | Confused deputy | Agent acts in wrong account/site | Session-scoped context; confirm target |
 | Silent autonomy creep | “Just this once” becomes default spend | Autonomy levels; spend always confirm |
+| Prompt-only safety | “Please don’t store passwords” in the prompt | **Rejected** — enforce in code |
 
 ## Never store
 
@@ -54,45 +57,55 @@ Default location: local Behavior store only. No cloud sync in v1.
 3. No “remember password” or “don’t ask for payments” toggle in v1.
 4. Dry-run mode: plan + simulate only; zero clicks that change state.
 
-## Memory rules (ML-ish, practical)
+## Memory rules
 
 1. **Write only on confirmed success** — don’t learn from denied or failed runs.
 2. **Pref > playbook > model improvisation** — reuse what the user approved.
 3. **TTL / decay later**; v1 at least supports delete/reset prefs.
-4. **No embedding of secrets** — if a field was redacted, it never enters vector/memory stores either.
+4. **No embedding of secrets** — redacted fields never enter vector/memory stores.
 5. **User is source of truth** — prefs are editable; agent suggestions are not silent writes.
 
 ## Plan validation (before execute)
 
-Reject or rewrite plans that:
+Reject plans that:
 
-- Include payment/checkout without a `spend` confirm step
+- Include payment/checkout without an explicit confirm-before-payment step
 - Ask to store or reuse credentials
 - Target a different site/account than the session context without re-confirm
 - Request always-on screen capture outside a hotkey session
 
-OpenClaw / cloud models are **untrusted planners**. Our `Agent` + `Actions` layers grade and gate every plan.
+OpenClaw / cloud models are **untrusted planners**. Grade with:
+
+```bash
+swift run StealthDesktop grade --file path/to/plan.json
+./scripts/openclaw-reorder-dryrun.sh
+```
 
 ## OpenClaw testing policy
 
-When using OpenClaw to prototype:
-
-- Prefer **DRY RUN / plan-only** prompts
-- Do not pass real passwords or cards into prompts
-- Grade outputs against this doc (pass/fail)
-- A plan that skips spend confirm = **fail**, even if the steps look smart
+- DRY RUN / plan-only prompts only unless deliberately testing live gates
+- Never put real passwords or cards into prompts
+- Grade outputs pass/fail against this doc
+- Skipping spend confirm = **fail**, even if the plan “looks smart”
+- When a new failure mode appears → add a fixture under `fixtures/plans/`
 
 ## v1 implementation checklist
 
 - [x] `Context` redacts secret-looking fields
 - [x] `Behavior` refuses never-store keys
-- [x] `Agent` marks spend/send/delete/auth as `needsConfirm` + `PlanValidator`
-- [x] `Actions` refuses gated classes without confirm; dry-run default
-- [x] CLI: `session` dry-run default; `--live --confirm` to record
-- [ ] Full Xcode test target enabled; keep expanding scrutiny cases
+- [x] `Agent` `PlanValidator` + risk/`needsConfirm`
+- [x] `Actions` dry-run default + hard gates
+- [x] CLI `grade` + OpenClaw grader script
+- [x] Security research + code-map docs
+- [ ] Persist Behavior store to disk (encrypted-at-rest later)
+- [ ] Confirm receipts / audit log
+- [ ] Structural playbook graph (spend node requires confirm predecessor)
+- [ ] Full Xcode test target enabled
 
 ## Related
 
-- Product principles: [docs/company/principles.md](../company/principles.md)
-- Architecture trust table: [technical-architecture.md](./technical-architecture.md)
-- Decisions log: [docs/product/decisions.md](../product/decisions.md)
+- [security-research.md](./security-research.md)
+- [security-code-map.md](./security-code-map.md)
+- [../company/principles.md](../company/principles.md)
+- [technical-architecture.md](./technical-architecture.md)
+- [../product/decisions.md](../product/decisions.md)

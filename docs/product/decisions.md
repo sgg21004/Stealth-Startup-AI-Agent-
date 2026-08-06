@@ -16,3 +16,5 @@ Dated locks. Newer wins if conflict.
 | 2026-08-06 | Security & memory are core infra | See `docs/eng/security-memory.md`; models are untrusted planners |
 | 2026-08-06 | Spend/send/delete/auth always confirm | No “skip payment confirm” in v1 |
 | 2026-08-06 | Never store credentials or raw payment secrets | Prefs/playbooks only after confirm; on-device |
+| 2026-08-06 | Security is the primary research/product surface | Docs hub leads with security; reorder is proving ground |
+| 2026-08-06 | Prompt-only safety is rejected | All critical gates enforced in Swift runtime + grader |

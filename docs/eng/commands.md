@@ -1,6 +1,7 @@
 # Commands cheat sheet
 
-Project root: `~/Projects/stealth-startup`
+Project root: `~/Projects/stealth-startup`  
+Docs hub (security first): [../README.md](../README.md)
 
 ## Everyday
 

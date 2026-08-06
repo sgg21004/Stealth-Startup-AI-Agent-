@@ -1,8 +1,21 @@
 # Stealth Startup
 
-macOS AI agent that lives with your **computer cursor**, learns on-screen behavior, and takes **approved** actions on tedious tasks — starting with **browser reorder / checkout**.
+macOS AI agent that lives with your **computer cursor**, learns on-screen behavior, and takes **approved** actions on tedious tasks — starting with browser reorder / checkout.
 
-No web frontend in v1. Native overlay comes with the real `.app`. Optional site can land later.
+**Biggest bet:** agent infrastructure + **security/scrutiny research**. Models are untrusted planners; runtime policy is law.
+
+No web frontend in v1.
+
+## Docs (start with security)
+
+Full index: **[docs/README.md](docs/README.md)**
+
+| Priority | Doc |
+| --- | --- |
+| 1 | [Security & memory (law)](docs/eng/security-memory.md) |
+| 2 | [Security research agenda](docs/eng/security-research.md) |
+| 3 | [Security code map](docs/eng/security-code-map.md) |
+| — | [Status](docs/STATUS.md) · [Thesis](docs/company/thesis.md) · [Commands](docs/eng/commands.md) |
 
 ## Quick start
 
@@ -11,47 +24,36 @@ cd ~/Projects/stealth-startup
 swift package resolve
 swift build
 swift run StealthDesktop status
-swift run StealthDesktop session --confirm
+swift run StealthDesktop policy
+swift run StealthDesktop session                 # dry-run
+swift run StealthDesktop session --live --confirm
 ```
 
-(`swift test` after full Xcode install — enable the test target in `Package.swift`.)
-
-Grade OpenClaw / planner plans against security policy:
+## Security scrutiny loop
 
 ```bash
 swift run StealthDesktop grade --self-test
-./scripts/openclaw-reorder-dryrun.sh          # needs: ollama serve
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
+./scripts/openclaw-reorder-dryrun.sh             # needs: ollama serve
 ```
 
-Or: `./scripts/dev.sh`
+Or smoke everything local: `./scripts/dev.sh`
 
-## Docs
-
-| Doc | Path |
-| --- | --- |
-| Thesis | [docs/company/thesis.md](docs/company/thesis.md) |
-| Principles | [docs/company/principles.md](docs/company/principles.md) |
-| Product | [docs/product/product-doc.md](docs/product/product-doc.md) |
-| Decisions | [docs/product/decisions.md](docs/product/decisions.md) |
-| Roadmap | [docs/product/roadmap.md](docs/product/roadmap.md) |
-| Architecture | [docs/eng/technical-architecture.md](docs/eng/technical-architecture.md) |
-| Setup | [docs/eng/setup.md](docs/eng/setup.md) |
-| Commands | [docs/eng/commands.md](docs/eng/commands.md) |
-| Security & memory | [docs/eng/security-memory.md](docs/eng/security-memory.md) |
 ## Repo layout
 
 ```
-apps/desktop/     # host (SPM CLI stub → future macOS .app)
+apps/desktop/     # host (CLI stub → future macOS .app)
 packages/         # Sensor, Context, Agent, Actions, Behavior
-docs/             # company / product / eng / gtm
-scripts/          # local helpers
+docs/             # company / product / eng (security first)
+fixtures/plans/   # policy regression corpus
+scripts/          # dev + OpenClaw grader
 ```
 
 ## Status
 
-Scaffold + stub agent loop. Next: install full Xcode, real Accessibility sensor, confirm UI, one live reorder playbook.
+Security policy enforced in runtime + OpenClaw grader loop.  
+Not yet: Xcode `.app`, real Accessibility sensor, live checkout execution.
 
 ## Remote
 
-GitHub: `sgg21004/Stealth-Startup-AI-Agent-` (local folder: `stealth-startup`)
+`sgg21004/Stealth-Startup-AI-Agent-` · local folder `stealth-startup`

@@ -42,11 +42,12 @@ People who live on a laptop all day and already do the same admin loops weekly �
 
 ## Product principles
 
-1. **Cursor is the UI affordance** — intent starts from where attention is.
-2. **Confirm before irreversible** — money, messages, deletes, account changes.
-3. **Local-first preference** — keep as much behavior data on-device as possible; cloud only when needed.
-4. **Cheaper over time** — route easy/repeated tasks to smaller/local models; escalate hard ones.
-5. **Earn autonomy** — start suggest-only; widen permissions as trust builds.
+1. **Security & scrutiny first** — untrusted planners; runtime makes unsafe memory/actions impossible ([security-memory](../eng/security-memory.md)).
+2. **Cursor is the UI affordance** — intent starts from where attention is.
+3. **Confirm before irreversible** — money, messages, deletes, account changes.
+4. **Local-first preference** — keep as much behavior data on-device as possible; cloud only when needed.
+5. **Cheaper over time** — route easy/repeated tasks to smaller/local models; escalate hard ones.
+6. **Earn autonomy** — start suggest-only; widen permissions as trust builds.
 
 ## v1 scope (build this first)
 
