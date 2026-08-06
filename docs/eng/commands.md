@@ -23,6 +23,16 @@ swift run StealthDesktop session
 # live + confirm (records playbook after gates)
 swift run StealthDesktop session --live --confirm
 
+# grade planner JSON (policy scrutiny)
+swift run StealthDesktop grade --self-test
+swift run StealthDesktop grade --file fixtures/plans/good-reorder.json
+
+# OpenClaw dry-run → grade (needs ollama serve)
+./scripts/openclaw-reorder-dryrun.sh
+
+# fixtures only (no OpenClaw)
+FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
+
 # all of the above smoke path
 ./scripts/dev.sh
 ```

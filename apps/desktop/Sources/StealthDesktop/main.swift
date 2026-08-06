@@ -11,7 +11,7 @@ struct StealthDesktop: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "StealthDesktop",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
-        subcommands: [Session.self, Status.self, Policy.self]
+        subcommands: [Session.self, Status.self, Policy.self, Grade.self]
     )
 }
 
@@ -42,6 +42,110 @@ struct Policy: ParsableCommand {
         print("memory: on-device prefs/playbooks after confirmed success only")
         print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
         print("doc: docs/eng/security-memory.md")
+    }
+}
+
+struct Grade: ParsableCommand {
+    static let configuration = CommandConfiguration(
+        abstract: "Grade an untrusted planner JSON plan against security-memory policy."
+    )
+
+    @Option(name: .long, help: "Path to plan JSON ({title,steps,risk,prefs_to_remember}).")
+    var file: String?
+
+    @Flag(name: .long, help: "Read plan JSON from stdin.")
+    var stdin: Bool = false
+
+    @Flag(name: .long, help: "Run built-in pass/fail fixtures (no OpenClaw).")
+    var selfTest: Bool = false
+
+    func run() throws {
+        if selfTest {
+            try runSelfTest()
+            return
+        }
+
+        let data: Data
+        if stdin {
+            data = FileHandle.standardInput.readDataToEndOfFile()
+        } else if let file {
+            data = try Data(contentsOf: URL(fileURLWithPath: file))
+        } else {
+            throw ValidationError("Pass --file, --stdin, or --self-test")
+        }
+
+        let draft = try PlanGrader.decodeDraft(from: data)
+        let report = PlanGrader.grade(draft)
+        printReport(report, source: file ?? "stdin")
+        if !report.passed {
+            throw ExitCode(2)
+        }
+    }
+
+    private func runSelfTest() throws {
+        let good = PlanDraft(
+            title: "Reorder from Amazon Subscribe & Save",
+            steps: [
+                "Open cart / reorder page",
+                "Apply saved prefs (never passwords)",
+                "Pause before payment for confirm",
+            ],
+            risk: .spend,
+            prefsToRemember: ["preferred_vendor=Amazon Subscribe & Save"]
+        )
+        let badCreds = PlanDraft(
+            title: "Reorder and save login credentials",
+            steps: ["Open Amazon", "Reuse password", "Place order"],
+            risk: .spend,
+            prefsToRemember: ["Store Amazon login credentials"]
+        )
+        let badNoConfirm = PlanDraft(
+            title: "Buy coffee pods",
+            steps: ["Open cart", "Place order and pay"],
+            risk: .spend,
+            prefsToRemember: []
+        )
+
+        var failed = false
+        let goodReport = PlanGrader.grade(good)
+        printReport(goodReport, source: "fixture:good")
+        if !goodReport.passed {
+            print("self-test ERROR: good fixture should pass")
+            failed = true
+        }
+
+        let badCredsReport = PlanGrader.grade(badCreds)
+        printReport(badCredsReport, source: "fixture:bad-creds")
+        if badCredsReport.passed {
+            print("self-test ERROR: bad-creds fixture should fail")
+            failed = true
+        }
+
+        let badConfirmReport = PlanGrader.grade(badNoConfirm)
+        printReport(badConfirmReport, source: "fixture:bad-no-confirm")
+        if badConfirmReport.passed {
+            print("self-test ERROR: bad-no-confirm fixture should fail")
+            failed = true
+        }
+
+        if failed {
+            throw ExitCode(1)
+        }
+        print("self-test: PASS")
+    }
+
+    private func printReport(_ report: GradeReport, source: String) {
+        print("grade: \(report.passed ? "PASS" : "FAIL") source=\(source)")
+        print("title: \(report.title)")
+        print("steps: \(report.stepCount)")
+        if report.failures.isEmpty {
+            print("failures: none")
+        } else {
+            print("failures:")
+            for f in report.failures {
+                print("  - \(f)")
+            }
+        }
     }
 }
 

@@ -5,7 +5,7 @@
 - [x] Monorepo + SPM packages + CLI host stub
 - [x] Security & memory policy (`docs/eng/security-memory.md`)
 - [x] Encode policy in Agent / Actions / Behavior (refuse secrets, force spend confirm)
-- [ ] OpenClaw dry-runs graded against policy (scripted pass/fail)
+- [x] OpenClaw dry-runs graded against policy (`scripts/openclaw-reorder-dryrun.sh`)
 - [ ] Install full Xcode (needed for real `.app` + Accessibility entitlements)
 - [ ] Wire real cursor/focus sensor (Accessibility)
 - [ ] Minimal confirm UI (native overlay or CLI confirm → then overlay)

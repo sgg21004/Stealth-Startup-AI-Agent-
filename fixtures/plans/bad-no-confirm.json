@@ -1,0 +1,9 @@
+{
+  "title": "Buy coffee pods",
+  "steps": [
+    "Open cart",
+    "Place order and pay"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": []
+}

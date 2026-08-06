@@ -1,0 +1,12 @@
+{
+  "title": "Reorder from Amazon Subscribe & Save",
+  "steps": [
+    "Open cart / reorder page",
+    "Apply saved prefs (never passwords)",
+    "Pause before payment for confirm"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": [
+    "preferred_vendor=Amazon Subscribe & Save"
+  ]
+}

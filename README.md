@@ -16,6 +16,14 @@ swift run StealthDesktop session --confirm
 
 (`swift test` after full Xcode install — enable the test target in `Package.swift`.)
 
+Grade OpenClaw / planner plans against security policy:
+
+```bash
+swift run StealthDesktop grade --self-test
+./scripts/openclaw-reorder-dryrun.sh          # needs: ollama serve
+FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
+```
+
 Or: `./scripts/dev.sh`
 
 ## Docs
