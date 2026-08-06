@@ -28,3 +28,8 @@ Last updated: 2026-08-06
 2. More adversarial fixtures from real OpenClaw fails
 3. Formal playbook graph where spend requires a confirm node
 4. Xcode app + real sensor only after policy feels boringly solid
+
+## Writing
+
+- Substack + Overleaf setup: `docs/gtm/writing.md`
+- Don’t draft a full paper until the grade corpus grows; ship Substack notes first

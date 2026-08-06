@@ -38,6 +38,10 @@ Reorder on macOS is the proving ground — not the whole company.
 
 See [STATUS.md](STATUS.md).
 
-## GTM
+## GTM / writing
 
-Empty until something ships (`gtm/`).
+| Doc | Path |
+| --- | --- |
+| Writing setup (Substack + Overleaf) | [gtm/writing.md](gtm/writing.md) |
+| Substack outlines | [gtm/substack-posts.md](gtm/substack-posts.md) |
+| Overleaf starter (paste-in) | [gtm/overleaf-starter.md](gtm/overleaf-starter.md) |
