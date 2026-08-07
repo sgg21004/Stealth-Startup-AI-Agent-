@@ -21,4 +21,4 @@ Dated locks. Newer wins if conflict.
 | 2026-08-07 | Playbook graph confirm-predecessor | Confirm *after* spend is invalid even if the word “confirm” appears |
 | 2026-08-07 | Skills drive proposals | Retrieved skill cards change `AgentBrain.propose`, not just context printout |
 | 2026-08-07 | TTY confirm is the gate | `--confirm` is script pre-approve; live mode prompts on a TTY |
-| 2026-08-07 | Product/repo name: Galaxy Labs | GitHub `galaxy-labs`; CLI `GalaxyLabs`; App Support `GalaxyLabs` |
+| 2026-08-07 | Product/repo name: Fitts Labs | GitHub `fitts-labs`; CLI `FittsLabs`; App Support `FittsLabs` |

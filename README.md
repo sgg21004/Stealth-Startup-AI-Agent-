@@ -1,4 +1,4 @@
-# Galaxy Labs
+# Fitts Labs
 
 macOS AI agent that lives with your **computer cursor**, learns on-screen behavior, and takes **approved** actions on tedious tasks — starting with browser reorder / checkout.
 
@@ -20,19 +20,19 @@ Full index: **[docs/README.md](docs/README.md)**
 ## Quick start
 
 ```bash
-cd ~/Projects/galaxy-labs
+cd ~/Projects/fitts-labs
 swift package resolve
 swift build
-swift run GalaxyLabs status
-swift run GalaxyLabs policy
-swift run GalaxyLabs session                 # dry-run
-swift run GalaxyLabs session --live --confirm
+swift run FittsLabs status
+swift run FittsLabs policy
+swift run FittsLabs session                 # dry-run
+swift run FittsLabs session --live --confirm
 ```
 
 ## Security scrutiny loop
 
 ```bash
-swift run GalaxyLabs grade --self-test
+swift run FittsLabs grade --self-test
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ./scripts/openclaw-reorder-dryrun.sh             # needs: ollama serve
 ```
@@ -56,4 +56,4 @@ Not yet: Xcode `.app`, real Accessibility sensor, live checkout execution.
 
 ## Remote
 
-`sgg21004/galaxy-labs` · local folder `galaxy-labs`
+`sgg21004/fitts-labs` · local folder `fitts-labs`

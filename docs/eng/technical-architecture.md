@@ -1,4 +1,4 @@
-# Galaxy Labs — Technical Architecture
+# Fitts Labs — Technical Architecture
 
 ## Goal
 
@@ -73,9 +73,9 @@ Desktop AI agent tied to the **system cursor** and screen context, with a behavi
 ## Repo layout (scaffolded)
 
 ```
-galaxy-labs/
+fitts-labs/
   Package.swift
-  apps/desktop/       # GalaxyLabs host (CLI stub → future .app)
+  apps/desktop/       # FittsLabs host (CLI stub → future .app)
   packages/
     Sensor/
     Context/

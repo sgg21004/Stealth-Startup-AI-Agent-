@@ -7,9 +7,9 @@ import Actions
 import Behavior
 
 @main
-struct GalaxyLabs: AsyncParsableCommand {
+struct FittsLabs: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "GalaxyLabs",
+        commandName: "FittsLabs",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
         subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self, Audit.self, Skills.self]
     )
@@ -26,11 +26,11 @@ struct Status: AsyncParsableCommand {
         try await store.load()
         let snap = await store.snapshot()
 
-        print("galaxy-labs")
-        print("host: GalaxyLabs (SPM executable stub)")
+        print("fitts-labs")
+        print("host: FittsLabs (SPM executable stub)")
         print("platform: macOS only")
         print("vertical: browser reorder")
-        let sensorMode = ProcessInfo.processInfo.environment["GALAXY_SENSOR"] == "stub" ? "stub" : "local"
+        let sensorMode = ProcessInfo.processInfo.environment["FITTS_SENSOR"] == "stub" ? "stub" : "local"
         print("sensing: \(sensorMode) (frontmost app + mouse; a11y tree later)")
         print("policy: security-memory enforced in Behavior/Agent/Actions")
         print("default session mode: dry-run")
@@ -58,8 +58,8 @@ struct Policy: ParsableCommand {
         print("never-store: passwords, tokens, cookies, cards, CVV, SSN")
         print("always-confirm: spend, send, delete, auth")
         print("memory: on-device prefs/playbooks after confirmed success only")
-        print("memory.path: ~/Library/Application Support/GalaxyLabs/behavior.json")
-        print("audit.path: ~/Library/Application Support/GalaxyLabs/audit.jsonl")
+        print("memory.path: ~/Library/Application Support/FittsLabs/behavior.json")
+        print("audit.path: ~/Library/Application Support/FittsLabs/audit.jsonl")
         print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
         print("doc: docs/eng/security-memory.md")
     }
@@ -388,7 +388,7 @@ struct Session: AsyncParsableCommand {
     var assumeApp: String?
 
     func run() async throws {
-        let useStub = ProcessInfo.processInfo.environment["GALAXY_SENSOR"] == "stub"
+        let useStub = ProcessInfo.processInfo.environment["FITTS_SENSOR"] == "stub"
         let assembler = ContextAssembler()
         let brain = AgentBrain()
         let runtime = ActionRuntime()
@@ -463,7 +463,7 @@ struct Session: AsyncParsableCommand {
         switch brain.propose(from: pack, preferences: prefs, skills: matched) {
         case .failure(let err):
             print("proposal: \(err)")
-            print("hint: focus a browser, pass --assume-app Safari, or GALAXY_SENSOR=stub")
+            print("hint: focus a browser, pass --assume-app Safari, or FITTS_SENSOR=stub")
             return
         case .success(let value):
             proposal = value
@@ -586,19 +586,19 @@ struct Session: AsyncParsableCommand {
     }
 
     private static func applyAssumeApp(_ snap: CursorSnapshot, assumeApp: String?) -> CursorSnapshot {
-        let env = ProcessInfo.processInfo.environment["GALAXY_ASSUME_APP"]
+        let env = ProcessInfo.processInfo.environment["FITTS_ASSUME_APP"]
         let name = (assumeApp?.isEmpty == false ? assumeApp : nil) ?? (env?.isEmpty == false ? env : nil)
         guard let name else { return snap }
         return CursorSnapshot(x: snap.x, y: snap.y, frontmostApp: name, timestamp: snap.timestamp)
     }
 
-    /// Interactive confirm: shows what / where / risk / steps. `--confirm` or GALAXY_ASSUME_YES=1 for scripts.
+    /// Interactive confirm: shows what / where / risk / steps. `--confirm` or FITTS_ASSUME_YES=1 for scripts.
     private static func resolveConfirm(proposal: ProposedAction, flagConfirm: Bool, app: String) throws -> Bool {
         if flagConfirm { return true }
-        if ProcessInfo.processInfo.environment["GALAXY_ASSUME_YES"] == "1" { return true }
+        if ProcessInfo.processInfo.environment["FITTS_ASSUME_YES"] == "1" { return true }
 
         guard isatty(fileno(stdin)) != 0 else {
-            print("confirm: non-TTY — pass --confirm or GALAXY_ASSUME_YES=1")
+            print("confirm: non-TTY — pass --confirm or FITTS_ASSUME_YES=1")
             return false
         }
 

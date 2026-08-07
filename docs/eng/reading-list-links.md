@@ -11,7 +11,7 @@ Problem in one sentence:
 Weight CL vs memory/token CL vs prompt stuffing?
 What do they store? What do they forget?
 Security: can this store secrets? any confirm gates?
-Steal for Galaxy: one idea we could test next week
+Steal for Fitts Labs: one idea we could test next week
 ```
 
 ---
@@ -75,7 +75,7 @@ Steal for Galaxy: one idea we could test next week
 
 ---
 
-## Week 6 — Security (Galaxy differentiator)
+## Week 6 — Security (Fitts Labs differentiator)
 
 - AgentSpec: https://arxiv.org/abs/2503.18666
 - Progent: https://arxiv.org/abs/2504.11703
@@ -88,10 +88,10 @@ Steal for Galaxy: one idea we could test next week
 ## Our repo demos (after reading)
 
 ```bash
-cd ~/Projects/galaxy-labs
+cd ~/Projects/fitts-labs
 ./scripts/cross-session-skills.sh
 ./scripts/retention-eval.sh
-swift run GalaxyLabs skills list
+swift run FittsLabs skills list
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

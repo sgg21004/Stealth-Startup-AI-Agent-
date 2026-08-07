@@ -1,12 +1,12 @@
 # Commands cheat sheet
 
-Project root: `~/Projects/galaxy-labs`  
+Project root: `~/Projects/fitts-labs`  
 Docs hub (security first): [../README.md](../README.md)
 
 ## Everyday
 
 ```bash
-cd ~/Projects/galaxy-labs
+cd ~/Projects/fitts-labs
 
 # fetch deps
 swift package resolve
@@ -15,25 +15,25 @@ swift package resolve
 swift build
 
 # status / policy
-swift run GalaxyLabs status
-swift run GalaxyLabs policy
+swift run FittsLabs status
+swift run FittsLabs policy
 
 # dry-run session (default — no playbook write)
-swift run GalaxyLabs session
+swift run FittsLabs session
 
 # live + confirm (records playbook after gates → disk)
-swift run GalaxyLabs session --live --confirm
+swift run FittsLabs session --live --confirm
 
-# on-device memory (default: ~/Library/Application Support/GalaxyLabs/behavior.json)
-swift run GalaxyLabs memory show
-swift run GalaxyLabs memory reset
+# on-device memory (default: ~/Library/Application Support/FittsLabs/behavior.json)
+swift run FittsLabs memory show
+swift run FittsLabs memory reset
 
 # confirm receipts / audit trail (audit.jsonl)
-swift run GalaxyLabs audit show
-swift run GalaxyLabs audit reset
+swift run FittsLabs audit show
+swift run FittsLabs audit reset
 
 # cross-session skill cards (continual learning)
-swift run GalaxyLabs skills list
+swift run FittsLabs skills list
 ./scripts/cross-session-skills.sh
 ./scripts/retention-eval.sh   # learn A → learn B → A still works
 
@@ -41,12 +41,12 @@ swift run GalaxyLabs skills list
 # docs/eng/reading-list-links.md
 
 # optional overrides for tests
-# GALAXY_BEHAVIOR_PATH=/tmp/behavior.json GALAXY_AUDIT_PATH=/tmp/audit.jsonl \
-#   swift run GalaxyLabs session --live --confirm
+# FITTS_BEHAVIOR_PATH=/tmp/behavior.json FITTS_AUDIT_PATH=/tmp/audit.jsonl \
+#   swift run FittsLabs session --live --confirm
 
 # grade planner JSON (policy scrutiny)
-swift run GalaxyLabs grade --self-test
-swift run GalaxyLabs grade --file fixtures/plans/good-reorder.json
+swift run FittsLabs grade --self-test
+swift run FittsLabs grade --file fixtures/plans/good-reorder.json
 
 # OpenClaw dry-run → grade (needs ollama serve)
 ./scripts/openclaw-reorder-dryrun.sh
@@ -61,7 +61,7 @@ FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ## Git
 
 ```bash
-cd ~/Projects/galaxy-labs
+cd ~/Projects/fitts-labs
 
 git status
 git diff
@@ -90,10 +90,10 @@ swift test
 
 ```bash
 # Cursor / VS Code style
-cursor ~/Projects/galaxy-labs
+cursor ~/Projects/fitts-labs
 
 # or Finder
-open ~/Projects/galaxy-labs
+open ~/Projects/fitts-labs
 ```
 
 ## Useful paths
@@ -107,12 +107,12 @@ open ~/Projects/galaxy-labs
 | Setup | `docs/eng/setup.md` |
 | Security & memory | `docs/eng/security-memory.md` |
 | This file | `docs/eng/commands.md` |
-| Host code | `apps/desktop/Sources/GalaxyLabs/` |
+| Host code | `apps/desktop/Sources/FittsLabs/` |
 | Packages | `packages/*` |
 
 ## Remote
 
 ```bash
 git remote -v
-# origin https://github.com/sgg21004/galaxy-labs.git
+# origin https://github.com/sgg21004/fitts-labs.git
 ```

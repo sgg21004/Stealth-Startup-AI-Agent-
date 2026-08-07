@@ -47,7 +47,7 @@ public actor LocalSensor: Sensing {
     }
 }
 
-/// Deterministic stub for scripts / CI (`GALAXY_SENSOR=stub`).
+/// Deterministic stub for scripts / CI (`FITTS_SENSOR=stub`).
 public actor StubSensor: Sensing {
     private var active = false
     private let appName: String

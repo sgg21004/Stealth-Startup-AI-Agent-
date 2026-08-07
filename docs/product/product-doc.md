@@ -1,4 +1,4 @@
-# Galaxy Labs — Product Doc
+# Fitts Labs — Product Doc
 
 ## One-liner
 

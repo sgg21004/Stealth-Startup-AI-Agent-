@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with GalaxyLabs.
+# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with FittsLabs.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -14,7 +14,7 @@ echo "== galaxy openclaw reorder dry-run grader =="
 swift build >/dev/null
 
 echo "-- self-test (local fixtures)"
-swift run GalaxyLabs grade --self-test
+swift run FittsLabs grade --self-test
 
 echo "-- grade fixtures/plans corpus"
 pass_n=0
@@ -22,13 +22,13 @@ fail_n=0
 for f in "$ROOT"/fixtures/plans/*.json; do
   base="$(basename "$f")"
   set +e
-  swift run GalaxyLabs grade --file "$f" >/tmp/galaxy-grade-out.txt
+  swift run FittsLabs grade --file "$f" >/tmp/fitts-grade-out.txt
   code=$?
   set -e
   if [[ "$base" == good-* ]]; then
     if [[ "$code" -ne 0 ]]; then
       echo "ERROR: $base should PASS"
-      cat /tmp/galaxy-grade-out.txt
+      cat /tmp/fitts-grade-out.txt
       exit 1
     fi
     pass_n=$((pass_n + 1))
@@ -36,7 +36,7 @@ for f in "$ROOT"/fixtures/plans/*.json; do
   else
     if [[ "$code" -ne 2 ]]; then
       echo "ERROR: $base should FAIL with exit 2 (got $code)"
-      cat /tmp/galaxy-grade-out.txt
+      cat /tmp/fitts-grade-out.txt
       exit 1
     fi
     fail_n=$((fail_n + 1))
@@ -130,7 +130,7 @@ PY
 
 echo "-- grade openclaw plan"
 set +e
-swift run GalaxyLabs grade --file "$JSON"
+swift run FittsLabs grade --file "$JSON"
 grade_exit=$?
 set -e
 

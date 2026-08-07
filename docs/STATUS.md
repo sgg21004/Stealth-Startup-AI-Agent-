@@ -5,20 +5,20 @@ Last updated: 2026-08-07
 ## What exists
 
 - Company/product/eng docs; security is first-class
-- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `GalaxyLabs` CLI
+- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `FittsLabs` CLI
 - Security runtime: redaction, never-store memory, plan validation, dry-run default, spend confirm
 - **Playbook graph** — irreversible steps need confirm predecessor
-- **On-disk Behavior store** at `~/Library/Application Support/GalaxyLabs/behavior.json`
-- **Confirm receipts** at `~/Library/Application Support/GalaxyLabs/audit.jsonl`
+- **On-disk Behavior store** at `~/Library/Application Support/FittsLabs/behavior.json`
+- **Confirm receipts** at `~/Library/Application Support/FittsLabs/audit.jsonl`
 - **Skill cards drive proposals** (not just printed) — `proposal.origin: skill:…`
-- **Interactive TTY confirm** on `--live` (or `--confirm` / `GALAXY_ASSUME_YES=1` for scripts)
-- **LocalSensor** — real frontmost app + mouse (`GALAXY_SENSOR=stub` for CI)
+- **Interactive TTY confirm** on `--live` (or `--confirm` / `FITTS_ASSUME_YES=1` for scripts)
+- **LocalSensor** — real frontmost app + mouse (`FITTS_SENSOR=stub` for CI)
 - Never-store on prefs **and** playbook/skill/audit text
 - Retention eval A→B→A + skill-driven propose: `scripts/retention-eval.sh`
 - OpenClaw reorder dry-run → JSON → `PlanGrader` loop
 - Research note: `docs/eng/continual-learning.md`
 - Full links: `docs/eng/reading-list-links.md`
-- GitHub remote: `sgg21004/galaxy-labs` (local: `~/Projects/galaxy-labs`)
+- GitHub remote: `sgg21004/fitts-labs` (local: `~/Projects/fitts-labs`)
 
 ## What does not exist yet
 

@@ -24,12 +24,12 @@ Sensor → Context(Redactor) → Agent(PlanValidator) → Actions(gates) → Beh
 ## CLI surface
 
 ```bash
-swift run GalaxyLabs policy          # print hard rules
-swift run GalaxyLabs session --assume-app Safari
-swift run GalaxyLabs session --live --assume-app Safari   # TTY confirm
-swift run GalaxyLabs session --live --confirm --assume-app Safari
-GALAXY_SENSOR=stub ./scripts/retention-eval.sh
-swift run GalaxyLabs grade --self-test
+swift run FittsLabs policy          # print hard rules
+swift run FittsLabs session --assume-app Safari
+swift run FittsLabs session --live --assume-app Safari   # TTY confirm
+swift run FittsLabs session --live --confirm --assume-app Safari
+FITTS_SENSOR=stub ./scripts/retention-eval.sh
+swift run FittsLabs grade --self-test
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

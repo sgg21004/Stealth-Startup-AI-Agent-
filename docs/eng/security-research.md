@@ -28,7 +28,7 @@ Method:
 Commands:
 
 ```bash
-swift run GalaxyLabs grade --self-test
+swift run FittsLabs grade --self-test
 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

@@ -15,7 +15,7 @@ Create a blank Overleaf project, then create/replace `main.tex` and `refs.bib` w
 
 \title{Runtime Scrutiny for Consumer Desktop Agents:\\
 Untrusted Planners, Memory Hygiene, and Spend Gates}
-\author{Sahil Gandhi\\Galaxy Labs}
+\author{Sahil Gandhi\\Fitts Labs}
 \date{\today}
 
 \begin{document}

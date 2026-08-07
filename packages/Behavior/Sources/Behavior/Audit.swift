@@ -36,9 +36,9 @@ public struct ConfirmReceipt: Sendable, Codable, Equatable, Identifiable {
 }
 
 public enum AuditPaths: Sendable {
-    /// `GALAXY_AUDIT_PATH` override, else Application Support `audit.jsonl`
+    /// `FITTS_AUDIT_PATH` override, else Application Support `audit.jsonl`
     public static func defaultAuditURL() throws -> URL {
-        if let override = ProcessInfo.processInfo.environment["GALAXY_AUDIT_PATH"], !override.isEmpty {
+        if let override = ProcessInfo.processInfo.environment["FITTS_AUDIT_PATH"], !override.isEmpty {
             let url = URL(fileURLWithPath: override)
             try FileManager.default.createDirectory(
                 at: url.deletingLastPathComponent(),
@@ -52,7 +52,7 @@ public enum AuditPaths: Sendable {
             appropriateFor: nil,
             create: true
         )
-        let dir = root.appendingPathComponent("GalaxyLabs", isDirectory: true)
+        let dir = root.appendingPathComponent("FittsLabs", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("audit.jsonl", isDirectory: false)
     }
