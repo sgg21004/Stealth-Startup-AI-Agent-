@@ -15,7 +15,7 @@ Sensor → Context(Redactor) → Agent(PlanValidator) → Actions(gates) → Beh
 | Package | File(s) | Security job |
 | --- | --- | --- |
 | `Context` | `packages/Context/.../Context.swift` | `Redactor` strips secret-looking strings from prefs/context |
-| `Behavior` | `packages/Behavior/.../Behavior.swift` | `MemoryPolicy` + `BehaviorStore.upsert` refuses never-store |
+| `Behavior` | `packages/Behavior/.../Behavior.swift` | `MemoryPolicy` + disk `BehaviorStore` (load/re-validate/persist/reset) |
 | `Agent` | `Agent.swift`, `PlanGrade.swift` | `PlanValidator`, `PlanGrader`, risk classes, confirm requirements |
 | `Actions` | `packages/Actions/.../Actions.swift` | dry-run default; hard gates for spend/send/delete/auth |
 | Host | `apps/desktop/.../main.swift` | `policy`, `session`, `grade` CLIs |

@@ -21,8 +21,15 @@ swift run StealthDesktop policy
 # dry-run session (default — no playbook write)
 swift run StealthDesktop session
 
-# live + confirm (records playbook after gates)
+# live + confirm (records playbook after gates → disk)
 swift run StealthDesktop session --live --confirm
+
+# on-device memory (default: ~/Library/Application Support/StealthStartup/behavior.json)
+swift run StealthDesktop memory show
+swift run StealthDesktop memory reset
+
+# optional override for tests
+# STEALTH_BEHAVIOR_PATH=/tmp/behavior.json swift run StealthDesktop memory show
 
 # grade planner JSON (policy scrutiny)
 swift run StealthDesktop grade --self-test

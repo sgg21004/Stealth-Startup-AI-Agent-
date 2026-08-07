@@ -7,6 +7,7 @@
 - [x] Security research agenda + code map + docs hub
 - [x] Encode policy in Agent / Actions / Behavior (refuse secrets, force spend confirm)
 - [x] OpenClaw dry-runs graded against policy (`scripts/openclaw-reorder-dryrun.sh`)
+- [x] Persist Behavior store on disk (never-store on write + load)
 - [ ] Install full Xcode (needed for real `.app` + Accessibility entitlements)
 - [ ] Wire real cursor/focus sensor (Accessibility)
 - [ ] Minimal confirm UI (native overlay or CLI confirm → then overlay)

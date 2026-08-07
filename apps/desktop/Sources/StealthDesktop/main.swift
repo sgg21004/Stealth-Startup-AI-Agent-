@@ -11,16 +11,21 @@ struct StealthDesktop: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "StealthDesktop",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
-        subcommands: [Session.self, Status.self, Policy.self, Grade.self]
+        subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self]
     )
 }
 
-struct Status: ParsableCommand {
+struct Status: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Print build/runtime status."
     )
 
-    func run() {
+    func run() async throws {
+        let url = try BehaviorPaths.defaultStoreURL()
+        let store = BehaviorStore(fileURL: url)
+        try await store.load()
+        let snap = await store.snapshot()
+
         print("stealth-startup")
         print("host: StealthDesktop (SPM executable stub)")
         print("platform: macOS only")
@@ -28,6 +33,9 @@ struct Status: ParsableCommand {
         print("sensing: hotkey session (stub)")
         print("policy: security-memory enforced in Behavior/Agent/Actions")
         print("default session mode: dry-run")
+        print("memory.path: \(url.path)")
+        print("memory.prefs: \(snap.preferences.count)")
+        print("memory.playbooks: \(snap.playbooks.count)")
     }
 }
 
@@ -40,8 +48,53 @@ struct Policy: ParsableCommand {
         print("never-store: passwords, tokens, cookies, cards, CVV, SSN")
         print("always-confirm: spend, send, delete, auth")
         print("memory: on-device prefs/playbooks after confirmed success only")
+        print("memory.path: ~/Library/Application Support/StealthStartup/behavior.json")
         print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
         print("doc: docs/eng/security-memory.md")
+    }
+}
+
+struct Memory: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "memory",
+        abstract: "Inspect or reset on-device Behavior store.",
+        subcommands: [Show.self, Reset.self]
+    )
+
+    struct Show: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Print prefs + playbooks from disk."
+        )
+
+        func run() async throws {
+            let url = try BehaviorPaths.defaultStoreURL()
+            let store = BehaviorStore(fileURL: url)
+            try await store.load()
+            let snap = await store.snapshot()
+            print("path: \(url.path)")
+            print("prefs: \(snap.preferences.count)")
+            for p in snap.preferences {
+                print("  - \(p.key)=\(p.value)")
+            }
+            print("playbooks: \(snap.playbooks.count)")
+            for pb in snap.playbooks {
+                print("  - \(pb.name) (\(pb.steps.count) steps)")
+            }
+        }
+    }
+
+    struct Reset: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Wipe on-device prefs + playbooks."
+        )
+
+        func run() async throws {
+            let url = try BehaviorPaths.defaultStoreURL()
+            let store = BehaviorStore(fileURL: url)
+            try await store.load()
+            try await store.reset()
+            print("memory: reset \(url.path)")
+        }
     }
 }
 
@@ -173,14 +226,21 @@ struct Session: AsyncParsableCommand {
         let assembler = ContextAssembler()
         let brain = AgentBrain()
         let runtime = ActionRuntime()
-        let store = BehaviorStore()
 
-        // Allowed pref
-        _ = try await store.upsert(
-            preference: Preference(key: "preferred_vendor", value: "Amazon Subscribe & Save")
-        )
+        let url = try BehaviorPaths.defaultStoreURL()
+        let store = BehaviorStore(fileURL: url)
+        try await store.load()
+        print("memory: loaded \(url.path)")
 
-        // Demonstrate never-store enforcement
+        // Seed vendor pref if missing (allowed)
+        if await store.allPreferences().contains(where: { $0.key == "preferred_vendor" }) == false {
+            _ = try await store.upsert(
+                preference: Preference(key: "preferred_vendor", value: "Amazon Subscribe & Save")
+            )
+            print("memory: seeded preferred_vendor")
+        }
+
+        // Demonstrate never-store enforcement (must not persist)
         do {
             _ = try await store.upsert(
                 preference: Preference(key: "amazon_password", value: "demo-should-fail")
@@ -201,6 +261,7 @@ struct Session: AsyncParsableCommand {
 
         print("session:on app=\(pack.app) mode=\(live ? "live" : "dry-run")")
         print("context: \(pack.summary)")
+        print("memory.prefs: \(prefs.count)")
 
         let proposal: ProposedAction
         switch brain.propose(from: pack, preferences: prefs) {
@@ -217,7 +278,6 @@ struct Session: AsyncParsableCommand {
         }
         print("needsConfirm: \(proposal.needsConfirm)")
 
-        // Bad plan demo (what OpenClaw incorrectly suggested earlier)
         let bad = ProposedAction(
             title: "Reorder and save login credentials",
             steps: ["Open Amazon", "Reuse password", "Place order"],
@@ -239,8 +299,9 @@ struct Session: AsyncParsableCommand {
         case .dryRun(let steps):
             print("outcome: dry-run \(steps.count) steps (pass --live --confirm to record)")
         case .confirmedAndRecorded(let playbook):
-            await store.save(playbook: playbook)
+            try await store.save(playbook: playbook)
             print("outcome: recorded playbook '\(playbook.name)' (\(playbook.steps.count) steps)")
+            print("memory: persisted")
         case .policyRejected(let reason):
             print("outcome: policy-rejected (\(reason))")
         }
