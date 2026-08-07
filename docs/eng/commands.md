@@ -1,12 +1,12 @@
 # Commands cheat sheet
 
-Project root: `~/Projects/stealth-startup`  
+Project root: `~/Projects/galaxy-agent`  
 Docs hub (security first): [../README.md](../README.md)
 
 ## Everyday
 
 ```bash
-cd ~/Projects/stealth-startup
+cd ~/Projects/galaxy-agent
 
 # fetch deps
 swift package resolve
@@ -15,25 +15,25 @@ swift package resolve
 swift build
 
 # status / policy
-swift run StealthDesktop status
-swift run StealthDesktop policy
+swift run GalaxyAgent status
+swift run GalaxyAgent policy
 
 # dry-run session (default — no playbook write)
-swift run StealthDesktop session
+swift run GalaxyAgent session
 
 # live + confirm (records playbook after gates → disk)
-swift run StealthDesktop session --live --confirm
+swift run GalaxyAgent session --live --confirm
 
-# on-device memory (default: ~/Library/Application Support/StealthStartup/behavior.json)
-swift run StealthDesktop memory show
-swift run StealthDesktop memory reset
+# on-device memory (default: ~/Library/Application Support/GalaxyAgent/behavior.json)
+swift run GalaxyAgent memory show
+swift run GalaxyAgent memory reset
 
 # confirm receipts / audit trail (audit.jsonl)
-swift run StealthDesktop audit show
-swift run StealthDesktop audit reset
+swift run GalaxyAgent audit show
+swift run GalaxyAgent audit reset
 
 # cross-session skill cards (continual learning)
-swift run StealthDesktop skills list
+swift run GalaxyAgent skills list
 ./scripts/cross-session-skills.sh
 ./scripts/retention-eval.sh   # learn A → learn B → A still works
 
@@ -41,12 +41,12 @@ swift run StealthDesktop skills list
 # docs/eng/reading-list-links.md
 
 # optional overrides for tests
-# STEALTH_BEHAVIOR_PATH=/tmp/behavior.json STEALTH_AUDIT_PATH=/tmp/audit.jsonl \
-#   swift run StealthDesktop session --live --confirm
+# GALAXY_BEHAVIOR_PATH=/tmp/behavior.json GALAXY_AUDIT_PATH=/tmp/audit.jsonl \
+#   swift run GalaxyAgent session --live --confirm
 
 # grade planner JSON (policy scrutiny)
-swift run StealthDesktop grade --self-test
-swift run StealthDesktop grade --file fixtures/plans/good-reorder.json
+swift run GalaxyAgent grade --self-test
+swift run GalaxyAgent grade --file fixtures/plans/good-reorder.json
 
 # OpenClaw dry-run → grade (needs ollama serve)
 ./scripts/openclaw-reorder-dryrun.sh
@@ -61,7 +61,7 @@ FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ## Git
 
 ```bash
-cd ~/Projects/stealth-startup
+cd ~/Projects/galaxy-agent
 
 git status
 git diff
@@ -90,10 +90,10 @@ swift test
 
 ```bash
 # Cursor / VS Code style
-cursor ~/Projects/stealth-startup
+cursor ~/Projects/galaxy-agent
 
 # or Finder
-open ~/Projects/stealth-startup
+open ~/Projects/galaxy-agent
 ```
 
 ## Useful paths
@@ -107,12 +107,12 @@ open ~/Projects/stealth-startup
 | Setup | `docs/eng/setup.md` |
 | Security & memory | `docs/eng/security-memory.md` |
 | This file | `docs/eng/commands.md` |
-| Host code | `apps/desktop/Sources/StealthDesktop/` |
+| Host code | `apps/desktop/Sources/GalaxyAgent/` |
 | Packages | `packages/*` |
 
 ## Remote
 
 ```bash
 git remote -v
-# origin https://github.com/sgg21004/Stealth-Startup-AI-Agent-.git
+# origin https://github.com/sgg21004/galaxy-agent.git
 ```

@@ -5,20 +5,20 @@ Last updated: 2026-08-07
 ## What exists
 
 - Company/product/eng docs; security is first-class
-- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `StealthDesktop` CLI
+- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `GalaxyAgent` CLI
 - Security runtime: redaction, never-store memory, plan validation, dry-run default, spend confirm
 - **Playbook graph** — irreversible steps need confirm predecessor
-- **On-disk Behavior store** at `~/Library/Application Support/StealthStartup/behavior.json`
-- **Confirm receipts** at `~/Library/Application Support/StealthStartup/audit.jsonl`
+- **On-disk Behavior store** at `~/Library/Application Support/GalaxyAgent/behavior.json`
+- **Confirm receipts** at `~/Library/Application Support/GalaxyAgent/audit.jsonl`
 - **Skill cards drive proposals** (not just printed) — `proposal.origin: skill:…`
-- **Interactive TTY confirm** on `--live` (or `--confirm` / `STEALTH_ASSUME_YES=1` for scripts)
-- **LocalSensor** — real frontmost app + mouse (`STEALTH_SENSOR=stub` for CI)
+- **Interactive TTY confirm** on `--live` (or `--confirm` / `GALAXY_ASSUME_YES=1` for scripts)
+- **LocalSensor** — real frontmost app + mouse (`GALAXY_SENSOR=stub` for CI)
 - Never-store on prefs **and** playbook/skill/audit text
 - Retention eval A→B→A + skill-driven propose: `scripts/retention-eval.sh`
 - OpenClaw reorder dry-run → JSON → `PlanGrader` loop
 - Research note: `docs/eng/continual-learning.md`
 - Full links: `docs/eng/reading-list-links.md`
-- GitHub remote: `sgg21004/Stealth-Startup-AI-Agent-` (local: `~/Projects/stealth-startup`)
+- GitHub remote: `sgg21004/galaxy-agent` (local: `~/Projects/galaxy-agent`)
 
 ## What does not exist yet
 

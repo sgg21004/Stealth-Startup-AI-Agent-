@@ -15,7 +15,7 @@
 - [x] Playbook graph: irreversible steps need confirm predecessor
 - [x] Skill-conditioned propose (`proposal.origin: skill:…`)
 - [x] Interactive CLI confirm (TTY; `--confirm` for scripts)
-- [x] LocalSensor frontmost app + mouse (`STEALTH_SENSOR=stub` for CI)
+- [x] LocalSensor frontmost app + mouse (`GALAXY_SENSOR=stub` for CI)
 - [x] Never-store on playbook/skill/audit text paths
 - [x] One reorder flow playbook (sense → propose → confirm → record) — CLI, record-only
 - [ ] Install full Xcode (needed for real `.app` + Accessibility entitlements)

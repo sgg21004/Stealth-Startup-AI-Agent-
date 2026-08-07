@@ -1,4 +1,4 @@
-# Stealth Startup — Technical Architecture
+# Galaxy Agent — Technical Architecture
 
 ## Goal
 
@@ -73,9 +73,9 @@ Desktop AI agent tied to the **system cursor** and screen context, with a behavi
 ## Repo layout (scaffolded)
 
 ```
-stealth-startup/
+galaxy-agent/
   Package.swift
-  apps/desktop/       # StealthDesktop host (CLI stub → future .app)
+  apps/desktop/       # GalaxyAgent host (CLI stub → future .app)
   packages/
     Sensor/
     Context/

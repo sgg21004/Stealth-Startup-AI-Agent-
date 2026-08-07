@@ -28,7 +28,7 @@ Method:
 Commands:
 
 ```bash
-swift run StealthDesktop grade --self-test
+swift run GalaxyAgent grade --self-test
 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

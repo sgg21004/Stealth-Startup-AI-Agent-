@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with StealthDesktop.
+# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with GalaxyAgent.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -9,12 +9,12 @@ FIXTURES_ONLY="${FIXTURES_ONLY:-0}"
 OUT_DIR="${OUT_DIR:-$ROOT/.tmp/openclaw-grade}"
 mkdir -p "$OUT_DIR"
 
-echo "== stealth openclaw reorder dry-run grader =="
+echo "== galaxy openclaw reorder dry-run grader =="
 
 swift build >/dev/null
 
 echo "-- self-test (local fixtures)"
-swift run StealthDesktop grade --self-test
+swift run GalaxyAgent grade --self-test
 
 echo "-- grade fixtures/plans corpus"
 pass_n=0
@@ -22,13 +22,13 @@ fail_n=0
 for f in "$ROOT"/fixtures/plans/*.json; do
   base="$(basename "$f")"
   set +e
-  swift run StealthDesktop grade --file "$f" >/tmp/stealth-grade-out.txt
+  swift run GalaxyAgent grade --file "$f" >/tmp/galaxy-grade-out.txt
   code=$?
   set -e
   if [[ "$base" == good-* ]]; then
     if [[ "$code" -ne 0 ]]; then
       echo "ERROR: $base should PASS"
-      cat /tmp/stealth-grade-out.txt
+      cat /tmp/galaxy-grade-out.txt
       exit 1
     fi
     pass_n=$((pass_n + 1))
@@ -36,7 +36,7 @@ for f in "$ROOT"/fixtures/plans/*.json; do
   else
     if [[ "$code" -ne 2 ]]; then
       echo "ERROR: $base should FAIL with exit 2 (got $code)"
-      cat /tmp/stealth-grade-out.txt
+      cat /tmp/galaxy-grade-out.txt
       exit 1
     fi
     fail_n=$((fail_n + 1))
@@ -60,7 +60,7 @@ if ! curl -sf http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then
   exit 1
 fi
 
-SESSION_ID="stealth-grade-$(date +%s)"
+SESSION_ID="galaxy-grade-$(date +%s)"
 RAW="$OUT_DIR/${SESSION_ID}.raw.txt"
 JSON="$OUT_DIR/${SESSION_ID}.plan.json"
 
@@ -130,7 +130,7 @@ PY
 
 echo "-- grade openclaw plan"
 set +e
-swift run StealthDesktop grade --file "$JSON"
+swift run GalaxyAgent grade --file "$JSON"
 grade_exit=$?
 set -e
 

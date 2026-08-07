@@ -24,12 +24,12 @@ Sensor → Context(Redactor) → Agent(PlanValidator) → Actions(gates) → Beh
 ## CLI surface
 
 ```bash
-swift run StealthDesktop policy          # print hard rules
-swift run StealthDesktop session --assume-app Safari
-swift run StealthDesktop session --live --assume-app Safari   # TTY confirm
-swift run StealthDesktop session --live --confirm --assume-app Safari
-STEALTH_SENSOR=stub ./scripts/retention-eval.sh
-swift run StealthDesktop grade --self-test
+swift run GalaxyAgent policy          # print hard rules
+swift run GalaxyAgent session --assume-app Safari
+swift run GalaxyAgent session --live --assume-app Safari   # TTY confirm
+swift run GalaxyAgent session --live --confirm --assume-app Safari
+GALAXY_SENSOR=stub ./scripts/retention-eval.sh
+swift run GalaxyAgent grade --self-test
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

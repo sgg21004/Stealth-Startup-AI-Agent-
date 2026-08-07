@@ -1,4 +1,4 @@
-# Stealth Startup — Product Doc
+# Galaxy Agent — Product Doc
 
 ## One-liner
 

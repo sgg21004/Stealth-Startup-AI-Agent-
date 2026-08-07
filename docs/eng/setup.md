@@ -10,11 +10,11 @@
 ## Bootstrap
 
 ```bash
-cd ~/Projects/stealth-startup
+cd ~/Projects/galaxy-agent
 swift package resolve
 swift build
-swift run StealthDesktop status
-swift run StealthDesktop session --confirm
+swift run GalaxyAgent status
+swift run GalaxyAgent session --confirm
 ```
 
 `swift test` needs **full Xcode** (Command Line Tools lack XCTest). Test sources live in `Tests/` ready to enable in `Package.swift` after Xcode install.

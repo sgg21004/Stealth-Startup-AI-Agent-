@@ -9,7 +9,7 @@ We do **not** start by retraining model weights. We start with **skills outside 
 
 ## Why this is our wedge
 
-| Typical coding CLI / chat agent | Stealth |
+| Typical coding CLI / chat agent | Galaxy |
 | --- | --- |
 | Memory trapped in one chat | Skills + prefs on disk across processes |
 | New Codex/CLI window forgets | New process loads relevant skill cards |
@@ -54,7 +54,7 @@ Problem in one sentence:
 Weight CL vs memory/token CL vs prompt stuffing?
 What do they store? What do they forget?
 Security: can this store secrets? any confirm gates?
-Steal for Stealth: one idea we could test next week
+Steal for Galaxy: one idea we could test next week
 ```
 
 ### Week 1 — Lab product docs (how industry ships memory)
@@ -127,7 +127,7 @@ On every lab paper: **What gets written to memory? Who can refuse a write? Is sp
 
 ## Lab “cheat sheet” (who cares about what)
 
-| Lab / org | Care about | Closest to Stealth |
+| Lab / org | Care about | Closest to Galaxy |
 | --- | --- | --- |
 | Anthropic | Product memory tools, dreams, context editing | Cross-session file memory |
 | OpenAI | Consumer chat memory, agents | Session amnesia problem users feel |

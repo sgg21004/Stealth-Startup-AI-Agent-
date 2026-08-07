@@ -1,4 +1,4 @@
-# Stealth Startup
+# Galaxy Agent
 
 macOS AI agent that lives with your **computer cursor**, learns on-screen behavior, and takes **approved** actions on tedious tasks — starting with browser reorder / checkout.
 
@@ -20,19 +20,19 @@ Full index: **[docs/README.md](docs/README.md)**
 ## Quick start
 
 ```bash
-cd ~/Projects/stealth-startup
+cd ~/Projects/galaxy-agent
 swift package resolve
 swift build
-swift run StealthDesktop status
-swift run StealthDesktop policy
-swift run StealthDesktop session                 # dry-run
-swift run StealthDesktop session --live --confirm
+swift run GalaxyAgent status
+swift run GalaxyAgent policy
+swift run GalaxyAgent session                 # dry-run
+swift run GalaxyAgent session --live --confirm
 ```
 
 ## Security scrutiny loop
 
 ```bash
-swift run StealthDesktop grade --self-test
+swift run GalaxyAgent grade --self-test
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ./scripts/openclaw-reorder-dryrun.sh             # needs: ollama serve
 ```
@@ -56,4 +56,4 @@ Not yet: Xcode `.app`, real Accessibility sensor, live checkout execution.
 
 ## Remote
 
-`sgg21004/Stealth-Startup-AI-Agent-` · local folder `stealth-startup`
+`sgg21004/galaxy-agent` · local folder `galaxy-agent`

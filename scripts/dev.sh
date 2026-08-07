@@ -3,9 +3,9 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 swift package resolve
 swift build
-swift run StealthDesktop status
-swift run StealthDesktop policy
-swift run StealthDesktop session
-swift run StealthDesktop session --live --confirm
-swift run StealthDesktop memory show
-swift run StealthDesktop audit show --limit 5
+swift run GalaxyAgent status
+swift run GalaxyAgent policy
+swift run GalaxyAgent session
+swift run GalaxyAgent session --live --confirm
+swift run GalaxyAgent memory show
+swift run GalaxyAgent audit show --limit 5
