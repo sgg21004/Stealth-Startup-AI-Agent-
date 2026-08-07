@@ -1,4 +1,4 @@
-# Galaxy Agent — Product Doc
+# Galaxy Labs — Product Doc
 
 ## One-liner
 

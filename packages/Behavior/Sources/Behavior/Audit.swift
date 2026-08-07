@@ -52,7 +52,7 @@ public enum AuditPaths: Sendable {
             appropriateFor: nil,
             create: true
         )
-        let dir = root.appendingPathComponent("GalaxyAgent", isDirectory: true)
+        let dir = root.appendingPathComponent("GalaxyLabs", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("audit.jsonl", isDirectory: false)
     }

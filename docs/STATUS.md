@@ -5,11 +5,11 @@ Last updated: 2026-08-07
 ## What exists
 
 - Company/product/eng docs; security is first-class
-- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `GalaxyAgent` CLI
+- SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `GalaxyLabs` CLI
 - Security runtime: redaction, never-store memory, plan validation, dry-run default, spend confirm
 - **Playbook graph** — irreversible steps need confirm predecessor
-- **On-disk Behavior store** at `~/Library/Application Support/GalaxyAgent/behavior.json`
-- **Confirm receipts** at `~/Library/Application Support/GalaxyAgent/audit.jsonl`
+- **On-disk Behavior store** at `~/Library/Application Support/GalaxyLabs/behavior.json`
+- **Confirm receipts** at `~/Library/Application Support/GalaxyLabs/audit.jsonl`
 - **Skill cards drive proposals** (not just printed) — `proposal.origin: skill:…`
 - **Interactive TTY confirm** on `--live` (or `--confirm` / `GALAXY_ASSUME_YES=1` for scripts)
 - **LocalSensor** — real frontmost app + mouse (`GALAXY_SENSOR=stub` for CI)
@@ -18,7 +18,7 @@ Last updated: 2026-08-07
 - OpenClaw reorder dry-run → JSON → `PlanGrader` loop
 - Research note: `docs/eng/continual-learning.md`
 - Full links: `docs/eng/reading-list-links.md`
-- GitHub remote: `sgg21004/galaxy-agent` (local: `~/Projects/galaxy-agent`)
+- GitHub remote: `sgg21004/galaxy-labs` (local: `~/Projects/galaxy-labs`)
 
 ## What does not exist yet
 

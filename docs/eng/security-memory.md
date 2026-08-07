@@ -77,7 +77,7 @@ Reject plans that:
 OpenClaw / cloud models are **untrusted planners**. Grade with:
 
 ```bash
-swift run GalaxyAgent grade --file path/to/plan.json
+swift run GalaxyLabs grade --file path/to/plan.json
 ./scripts/openclaw-reorder-dryrun.sh
 ```
 
@@ -97,7 +97,7 @@ swift run GalaxyAgent grade --file path/to/plan.json
 - [x] `Actions` dry-run default + hard gates
 - [x] CLI `grade` + OpenClaw grader script
 - [x] Security research + code-map docs
-- [x] Persist Behavior store to disk (`~/Library/Application Support/GalaxyAgent/behavior.json`)
+- [x] Persist Behavior store to disk (`~/Library/Application Support/GalaxyLabs/behavior.json`)
 - [x] Confirm receipts / audit log (`audit.jsonl`)
 - [x] Structural playbook graph (spend/send/delete/auth require confirm predecessor)
 - [x] Never-store on playbook/skill writes + audit scrub

@@ -40,7 +40,7 @@ git commit SHA                 →     footnote / appendix “as of <sha>”
 
 1. **Run something real**
    ```bash
-   swift run GalaxyAgent grade --self-test
+   swift run GalaxyLabs grade --self-test
    ./scripts/openclaw-reorder-dryrun.sh
    ```
 2. **Keep the artifact**
@@ -59,7 +59,7 @@ Overleaf ↔ GitHub sync is fine for `paper/` LaTeX sources. Still: **numbers an
 ## Accounts
 
 1. Substack publication  
-2. Overleaf blank project (`galaxy-agent-scrutiny`)  
+2. Overleaf blank project (`galaxy-labs-scrutiny`)  
 3. This GitHub repo = experiments + fixtures  
 
 ## What lives where

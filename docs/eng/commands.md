@@ -1,12 +1,12 @@
 # Commands cheat sheet
 
-Project root: `~/Projects/galaxy-agent`  
+Project root: `~/Projects/galaxy-labs`  
 Docs hub (security first): [../README.md](../README.md)
 
 ## Everyday
 
 ```bash
-cd ~/Projects/galaxy-agent
+cd ~/Projects/galaxy-labs
 
 # fetch deps
 swift package resolve
@@ -15,25 +15,25 @@ swift package resolve
 swift build
 
 # status / policy
-swift run GalaxyAgent status
-swift run GalaxyAgent policy
+swift run GalaxyLabs status
+swift run GalaxyLabs policy
 
 # dry-run session (default — no playbook write)
-swift run GalaxyAgent session
+swift run GalaxyLabs session
 
 # live + confirm (records playbook after gates → disk)
-swift run GalaxyAgent session --live --confirm
+swift run GalaxyLabs session --live --confirm
 
-# on-device memory (default: ~/Library/Application Support/GalaxyAgent/behavior.json)
-swift run GalaxyAgent memory show
-swift run GalaxyAgent memory reset
+# on-device memory (default: ~/Library/Application Support/GalaxyLabs/behavior.json)
+swift run GalaxyLabs memory show
+swift run GalaxyLabs memory reset
 
 # confirm receipts / audit trail (audit.jsonl)
-swift run GalaxyAgent audit show
-swift run GalaxyAgent audit reset
+swift run GalaxyLabs audit show
+swift run GalaxyLabs audit reset
 
 # cross-session skill cards (continual learning)
-swift run GalaxyAgent skills list
+swift run GalaxyLabs skills list
 ./scripts/cross-session-skills.sh
 ./scripts/retention-eval.sh   # learn A → learn B → A still works
 
@@ -42,11 +42,11 @@ swift run GalaxyAgent skills list
 
 # optional overrides for tests
 # GALAXY_BEHAVIOR_PATH=/tmp/behavior.json GALAXY_AUDIT_PATH=/tmp/audit.jsonl \
-#   swift run GalaxyAgent session --live --confirm
+#   swift run GalaxyLabs session --live --confirm
 
 # grade planner JSON (policy scrutiny)
-swift run GalaxyAgent grade --self-test
-swift run GalaxyAgent grade --file fixtures/plans/good-reorder.json
+swift run GalaxyLabs grade --self-test
+swift run GalaxyLabs grade --file fixtures/plans/good-reorder.json
 
 # OpenClaw dry-run → grade (needs ollama serve)
 ./scripts/openclaw-reorder-dryrun.sh
@@ -61,7 +61,7 @@ FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ## Git
 
 ```bash
-cd ~/Projects/galaxy-agent
+cd ~/Projects/galaxy-labs
 
 git status
 git diff
@@ -90,10 +90,10 @@ swift test
 
 ```bash
 # Cursor / VS Code style
-cursor ~/Projects/galaxy-agent
+cursor ~/Projects/galaxy-labs
 
 # or Finder
-open ~/Projects/galaxy-agent
+open ~/Projects/galaxy-labs
 ```
 
 ## Useful paths
@@ -107,12 +107,12 @@ open ~/Projects/galaxy-agent
 | Setup | `docs/eng/setup.md` |
 | Security & memory | `docs/eng/security-memory.md` |
 | This file | `docs/eng/commands.md` |
-| Host code | `apps/desktop/Sources/GalaxyAgent/` |
+| Host code | `apps/desktop/Sources/GalaxyLabs/` |
 | Packages | `packages/*` |
 
 ## Remote
 
 ```bash
 git remote -v
-# origin https://github.com/sgg21004/galaxy-agent.git
+# origin https://github.com/sgg21004/galaxy-labs.git
 ```

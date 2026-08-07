@@ -149,7 +149,7 @@ public struct BehaviorSnapshot: Sendable, Codable, Equatable {
 }
 
 public enum BehaviorPaths: Sendable {
-    /// `GALAXY_BEHAVIOR_PATH` override, else `~/Library/Application Support/GalaxyAgent/behavior.json`
+    /// `GALAXY_BEHAVIOR_PATH` override, else `~/Library/Application Support/GalaxyLabs/behavior.json`
     public static func defaultStoreURL() throws -> URL {
         if let override = ProcessInfo.processInfo.environment["GALAXY_BEHAVIOR_PATH"], !override.isEmpty {
             let url = URL(fileURLWithPath: override)
@@ -165,7 +165,7 @@ public enum BehaviorPaths: Sendable {
             appropriateFor: nil,
             create: true
         )
-        let dir = root.appendingPathComponent("GalaxyAgent", isDirectory: true)
+        let dir = root.appendingPathComponent("GalaxyLabs", isDirectory: true)
         try FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
         return dir.appendingPathComponent("behavior.json", isDirectory: false)
     }

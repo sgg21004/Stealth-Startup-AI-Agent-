@@ -1,4 +1,4 @@
-# Galaxy Agent — Technical Architecture
+# Galaxy Labs — Technical Architecture
 
 ## Goal
 
@@ -73,9 +73,9 @@ Desktop AI agent tied to the **system cursor** and screen context, with a behavi
 ## Repo layout (scaffolded)
 
 ```
-galaxy-agent/
+galaxy-labs/
   Package.swift
-  apps/desktop/       # GalaxyAgent host (CLI stub → future .app)
+  apps/desktop/       # GalaxyLabs host (CLI stub → future .app)
   packages/
     Sensor/
     Context/

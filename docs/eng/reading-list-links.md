@@ -88,10 +88,10 @@ Steal for Galaxy: one idea we could test next week
 ## Our repo demos (after reading)
 
 ```bash
-cd ~/Projects/galaxy-agent
+cd ~/Projects/galaxy-labs
 ./scripts/cross-session-skills.sh
 ./scripts/retention-eval.sh
-swift run GalaxyAgent skills list
+swift run GalaxyLabs skills list
 FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ```
 

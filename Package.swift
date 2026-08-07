@@ -2,12 +2,12 @@
 import PackageDescription
 
 let package = Package(
-    name: "galaxy-agent",
+    name: "galaxy-labs",
     platforms: [
         .macOS(.v14),
     ],
     products: [
-        .executable(name: "GalaxyAgent", targets: ["GalaxyAgent"]),
+        .executable(name: "GalaxyLabs", targets: ["GalaxyLabs"]),
         .library(name: "Sensor", targets: ["Sensor"]),
         .library(name: "Context", targets: ["Context"]),
         .library(name: "Agent", targets: ["Agent"]),
@@ -19,7 +19,7 @@ let package = Package(
     ],
     targets: [
         .executableTarget(
-            name: "GalaxyAgent",
+            name: "GalaxyLabs",
             dependencies: [
                 "Sensor",
                 "Context",
@@ -28,7 +28,7 @@ let package = Package(
                 "Behavior",
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
             ],
-            path: "apps/desktop/Sources/GalaxyAgent"
+            path: "apps/desktop/Sources/GalaxyLabs"
         ),
         .target(name: "Sensor", path: "packages/Sensor/Sources/Sensor"),
         .target(
@@ -52,9 +52,9 @@ let package = Package(
         ),
         // Re-enable after installing full Xcode (CLT has no XCTest / Swift Testing):
         // .testTarget(
-        //     name: "GalaxyAgentTests",
+        //     name: "GalaxyLabsTests",
         //     dependencies: ["Sensor", "Context", "Agent", "Actions", "Behavior"],
-        //     path: "Tests/GalaxyAgentTests"
+        //     path: "Tests/GalaxyLabsTests"
         // ),
     ]
 )

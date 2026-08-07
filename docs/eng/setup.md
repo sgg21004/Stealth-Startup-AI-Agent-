@@ -10,11 +10,11 @@
 ## Bootstrap
 
 ```bash
-cd ~/Projects/galaxy-agent
+cd ~/Projects/galaxy-labs
 swift package resolve
 swift build
-swift run GalaxyAgent status
-swift run GalaxyAgent session --confirm
+swift run GalaxyLabs status
+swift run GalaxyLabs session --confirm
 ```
 
 `swift test` needs **full Xcode** (Command Line Tools lack XCTest). Test sources live in `Tests/` ready to enable in `Package.swift` after Xcode install.

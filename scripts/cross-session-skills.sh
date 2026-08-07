@@ -15,17 +15,17 @@ rm -f "$STORE" "$AUDIT"
 swift build >/dev/null
 
 echo "== process 1: confirm session → save skill =="
-swift run GalaxyAgent session --live --confirm --assume-app Safari
+swift run GalaxyLabs session --live --confirm --assume-app Safari
 echo
 echo "== process 2: NEW process, no chat — list skills =="
-swift run GalaxyAgent skills list
+swift run GalaxyLabs skills list
 echo
 echo "== process 3: NEW process session should retrieve skill + use it =="
-swift run GalaxyAgent session --assume-app Safari | tee /tmp/galaxy-cross-session.txt
+swift run GalaxyLabs session --assume-app Safari | tee /tmp/galaxy-cross-session.txt
 grep -q "skills.retrieved: [1-9]" /tmp/galaxy-cross-session.txt
 grep -q "proposal.origin: skill" /tmp/galaxy-cross-session.txt
 echo
 echo "== status =="
-swift run GalaxyAgent status
+swift run GalaxyLabs status
 echo
 echo "PASS — cross-session skill retrieve + skill-driven proposal."

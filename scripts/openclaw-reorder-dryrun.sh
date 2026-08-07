@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with GalaxyAgent.
+# Ask OpenClaw for a reorder plan (dry-run / no tools), then grade it with GalaxyLabs.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
@@ -14,7 +14,7 @@ echo "== galaxy openclaw reorder dry-run grader =="
 swift build >/dev/null
 
 echo "-- self-test (local fixtures)"
-swift run GalaxyAgent grade --self-test
+swift run GalaxyLabs grade --self-test
 
 echo "-- grade fixtures/plans corpus"
 pass_n=0
@@ -22,7 +22,7 @@ fail_n=0
 for f in "$ROOT"/fixtures/plans/*.json; do
   base="$(basename "$f")"
   set +e
-  swift run GalaxyAgent grade --file "$f" >/tmp/galaxy-grade-out.txt
+  swift run GalaxyLabs grade --file "$f" >/tmp/galaxy-grade-out.txt
   code=$?
   set -e
   if [[ "$base" == good-* ]]; then
@@ -130,7 +130,7 @@ PY
 
 echo "-- grade openclaw plan"
 set +e
-swift run GalaxyAgent grade --file "$JSON"
+swift run GalaxyLabs grade --file "$JSON"
 grade_exit=$?
 set -e
 

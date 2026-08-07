@@ -7,9 +7,9 @@ import Actions
 import Behavior
 
 @main
-struct GalaxyAgent: AsyncParsableCommand {
+struct GalaxyLabs: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
-        commandName: "GalaxyAgent",
+        commandName: "GalaxyLabs",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
         subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self, Audit.self, Skills.self]
     )
@@ -26,8 +26,8 @@ struct Status: AsyncParsableCommand {
         try await store.load()
         let snap = await store.snapshot()
 
-        print("galaxy-agent")
-        print("host: GalaxyAgent (SPM executable stub)")
+        print("galaxy-labs")
+        print("host: GalaxyLabs (SPM executable stub)")
         print("platform: macOS only")
         print("vertical: browser reorder")
         let sensorMode = ProcessInfo.processInfo.environment["GALAXY_SENSOR"] == "stub" ? "stub" : "local"
@@ -58,8 +58,8 @@ struct Policy: ParsableCommand {
         print("never-store: passwords, tokens, cookies, cards, CVV, SSN")
         print("always-confirm: spend, send, delete, auth")
         print("memory: on-device prefs/playbooks after confirmed success only")
-        print("memory.path: ~/Library/Application Support/GalaxyAgent/behavior.json")
-        print("audit.path: ~/Library/Application Support/GalaxyAgent/audit.jsonl")
+        print("memory.path: ~/Library/Application Support/GalaxyLabs/behavior.json")
+        print("audit.path: ~/Library/Application Support/GalaxyLabs/audit.jsonl")
         print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
         print("doc: docs/eng/security-memory.md")
     }
