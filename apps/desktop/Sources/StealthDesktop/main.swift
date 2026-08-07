@@ -30,9 +30,11 @@ struct Status: AsyncParsableCommand {
         print("host: StealthDesktop (SPM executable stub)")
         print("platform: macOS only")
         print("vertical: browser reorder")
-        print("sensing: hotkey session (stub)")
+        let sensorMode = ProcessInfo.processInfo.environment["STEALTH_SENSOR"] == "stub" ? "stub" : "local"
+        print("sensing: \(sensorMode) (frontmost app + mouse; a11y tree later)")
         print("policy: security-memory enforced in Behavior/Agent/Actions")
         print("default session mode: dry-run")
+        print("propose: skill cards first, heuristic fallback")
         let auditURL = try AuditPaths.defaultAuditURL()
         let audit = AuditLog(fileURL: auditURL)
         let auditCount = try await audit.count()
@@ -376,14 +378,17 @@ struct Session: AsyncParsableCommand {
         abstract: "Run one opt-in attention session (dry-run by default)."
     )
 
-    @Flag(name: .long, help: "Record playbook after policy checks (still requires --confirm for spend).")
+    @Flag(name: .long, help: "Record playbook after policy checks (still requires confirm for spend).")
     var live: Bool = false
 
-    @Flag(name: .long, help: "User confirm for gated actions (spend/send/delete/auth).")
+    @Flag(name: .long, help: "Pre-approve gated actions (scripts/CI). Otherwise live mode prompts on a TTY.")
     var confirm: Bool = false
 
+    @Option(name: .long, help: "Override sensed frontmost app (e.g. Safari) when the CLI isn't focused on a browser.")
+    var assumeApp: String?
+
     func run() async throws {
-        let sensor = StubSensor()
+        let useStub = ProcessInfo.processInfo.environment["STEALTH_SENSOR"] == "stub"
         let assembler = ContextAssembler()
         let brain = AgentBrain()
         let runtime = ActionRuntime()
@@ -415,12 +420,24 @@ struct Session: AsyncParsableCommand {
             print("policy: blocked secret memory write (\(error))")
         }
 
-        await sensor.startSession()
-        defer {
-            Task { await sensor.stopSession() }
+        let snapshot: CursorSnapshot
+        let sensorLabel: String
+        if useStub {
+            let sensor = StubSensor()
+            await sensor.startSession()
+            let raw = await sensor.snapshot()
+            await sensor.stopSession()
+            snapshot = Self.applyAssumeApp(raw, assumeApp: assumeApp)
+            sensorLabel = "stub"
+        } else {
+            let sensor = LocalSensor()
+            await sensor.startSession()
+            let raw = await sensor.snapshot()
+            await sensor.stopSession()
+            snapshot = Self.applyAssumeApp(raw, assumeApp: assumeApp)
+            sensorLabel = "local"
         }
 
-        let snapshot = await sensor.snapshot()
         let prefs = await store.allPreferences()
         let vendor = prefs.first(where: { $0.key == "preferred_vendor" })?.value ?? "reorder"
         // Continual learning: retrieve skill cards for this process — no prior chat history.
@@ -434,7 +451,7 @@ struct Session: AsyncParsableCommand {
             skillTokensApprox: tok
         )
 
-        print("session:on app=\(pack.app) mode=\(live ? "live" : "dry-run")")
+        print("session:on app=\(pack.app) mode=\(live ? "live" : "dry-run") sensor=\(sensorLabel)")
         print("context: \(pack.summary)")
         print("memory.prefs: \(prefs.count)")
         print("skills.retrieved: \(matched.count) approx_tokens=\(tok) (not chat history)")
@@ -443,15 +460,17 @@ struct Session: AsyncParsableCommand {
         }
 
         let proposal: ProposedAction
-        switch brain.propose(from: pack, preferences: prefs) {
+        switch brain.propose(from: pack, preferences: prefs, skills: matched) {
         case .failure(let err):
             print("proposal: \(err)")
+            print("hint: focus a browser, pass --assume-app Safari, or STEALTH_SENSOR=stub")
             return
         case .success(let value):
             proposal = value
         }
 
         print("proposal: \(proposal.title) risk=\(proposal.risk.rawValue)")
+        print("proposal.origin: \(proposal.origin)")
         for (i, step) in proposal.steps.enumerated() {
             print("  \(i + 1). \(step)")
         }
@@ -466,9 +485,34 @@ struct Session: AsyncParsableCommand {
             print("scrutiny: rejected untrusted plan (\(err))")
         }
 
+        let userConfirmed: Bool
+        if !live {
+            userConfirmed = false
+        } else if proposal.needsConfirm {
+            userConfirmed = try Self.resolveConfirm(proposal: proposal, flagConfirm: confirm, app: pack.app)
+            if !userConfirmed {
+                print("outcome: denied (user refused confirm)")
+                try await audit.append(
+                    ConfirmReceipt(
+                        mode: "live",
+                        outcome: "denied",
+                        title: proposal.title,
+                        risk: proposal.risk.rawValue,
+                        steps: proposal.steps,
+                        userConfirmed: false,
+                        detail: "user refused confirm"
+                    )
+                )
+                print("audit: receipt written")
+                return
+            }
+        } else {
+            userConfirmed = true
+        }
+
         let outcome = runtime.execute(
             proposal: proposal,
-            confirmed: confirm,
+            confirmed: userConfirmed,
             dryRun: !live
         )
 
@@ -483,13 +527,13 @@ struct Session: AsyncParsableCommand {
                     title: proposal.title,
                     risk: proposal.risk.rawValue,
                     steps: proposal.steps,
-                    userConfirmed: confirm,
+                    userConfirmed: userConfirmed,
                     detail: reason
                 )
             )
             print("audit: receipt written")
         case .dryRun(let steps):
-            print("outcome: dry-run \(steps.count) steps (pass --live --confirm to record)")
+            print("outcome: dry-run \(steps.count) steps (pass --live; confirm on TTY or --confirm)")
             try await audit.append(
                 ConfirmReceipt(
                     mode: mode,
@@ -498,7 +542,7 @@ struct Session: AsyncParsableCommand {
                     risk: proposal.risk.rawValue,
                     steps: steps,
                     userConfirmed: false,
-                    detail: nil
+                    detail: "origin:\(proposal.origin)"
                 )
             )
         case .confirmedAndRecorded(let playbook):
@@ -519,8 +563,8 @@ struct Session: AsyncParsableCommand {
                     title: proposal.title,
                     risk: proposal.risk.rawValue,
                     steps: proposal.steps,
-                    userConfirmed: confirm,
-                    detail: "playbook:\(playbook.id);skill:\(skill.id)"
+                    userConfirmed: userConfirmed,
+                    detail: "playbook:\(playbook.id);skill:\(skill.id);origin:\(proposal.origin)"
                 )
             )
             print("audit: receipt written")
@@ -533,11 +577,43 @@ struct Session: AsyncParsableCommand {
                     title: proposal.title,
                     risk: proposal.risk.rawValue,
                     steps: proposal.steps,
-                    userConfirmed: confirm,
+                    userConfirmed: userConfirmed,
                     detail: reason
                 )
             )
             print("audit: receipt written")
         }
+    }
+
+    private static func applyAssumeApp(_ snap: CursorSnapshot, assumeApp: String?) -> CursorSnapshot {
+        let env = ProcessInfo.processInfo.environment["STEALTH_ASSUME_APP"]
+        let name = (assumeApp?.isEmpty == false ? assumeApp : nil) ?? (env?.isEmpty == false ? env : nil)
+        guard let name else { return snap }
+        return CursorSnapshot(x: snap.x, y: snap.y, frontmostApp: name, timestamp: snap.timestamp)
+    }
+
+    /// Interactive confirm: shows what / where / risk / steps. `--confirm` or STEALTH_ASSUME_YES=1 for scripts.
+    private static func resolveConfirm(proposal: ProposedAction, flagConfirm: Bool, app: String) throws -> Bool {
+        if flagConfirm { return true }
+        if ProcessInfo.processInfo.environment["STEALTH_ASSUME_YES"] == "1" { return true }
+
+        guard isatty(fileno(stdin)) != 0 else {
+            print("confirm: non-TTY — pass --confirm or STEALTH_ASSUME_YES=1")
+            return false
+        }
+
+        print("── confirm ──")
+        print("what: \(proposal.title)")
+        print("where: \(app)")
+        print("risk: \(proposal.risk.rawValue)")
+        print("origin: \(proposal.origin)")
+        for (i, step) in proposal.steps.enumerated() {
+            print("  \(i + 1). \(step)")
+        }
+        print("Proceed? [y/N] ", terminator: "")
+        guard let line = readLine()?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() else {
+            return false
+        }
+        return line == "y" || line == "yes"
     }
 }

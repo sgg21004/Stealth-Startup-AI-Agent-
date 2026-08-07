@@ -13,10 +13,13 @@
 - [x] Retention eval A→B→A (`scripts/retention-eval.sh`)
 - [x] Lab reading links file (`docs/eng/reading-list-links.md`)
 - [x] Playbook graph: irreversible steps need confirm predecessor
+- [x] Skill-conditioned propose (`proposal.origin: skill:…`)
+- [x] Interactive CLI confirm (TTY; `--confirm` for scripts)
+- [x] LocalSensor frontmost app + mouse (`STEALTH_SENSOR=stub` for CI)
+- [x] Never-store on playbook/skill/audit text paths
+- [x] One reorder flow playbook (sense → propose → confirm → record) — CLI, record-only
 - [ ] Install full Xcode (needed for real `.app` + Accessibility entitlements)
-- [ ] Wire real cursor/focus sensor (Accessibility)
-- [ ] Minimal confirm UI (native overlay or CLI confirm → then overlay)
-- [ ] One reorder flow playbook (sense → propose → confirm → record)
+- [ ] Accessibility tree sensor + native confirm overlay
 
 ## Next
 - Cloud model planning for unfamiliar pages

@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 /// Captures cursor/focus signals during an opt-in attention session.
@@ -21,8 +22,8 @@ public protocol Sensing: Sendable {
     func snapshot() async -> CursorSnapshot
 }
 
-/// Stub sensor for CLI/dev until Accessibility APIs are wired in the macOS app host.
-public actor StubSensor: Sensing {
+/// Real frontmost-app + mouse location via AppKit (no Accessibility tree yet).
+public actor LocalSensor: Sensing {
     private var active = false
 
     public init() {}
@@ -36,10 +37,38 @@ public actor StubSensor: Sensing {
     }
 
     public func snapshot() async -> CursorSnapshot {
+        let app = NSWorkspace.shared.frontmostApplication?.localizedName ?? "Unknown"
+        let loc = NSEvent.mouseLocation
+        return CursorSnapshot(
+            x: loc.x,
+            y: loc.y,
+            frontmostApp: active ? app : "None"
+        )
+    }
+}
+
+/// Deterministic stub for scripts / CI (`STEALTH_SENSOR=stub`).
+public actor StubSensor: Sensing {
+    private var active = false
+    private let appName: String
+
+    public init(appName: String = "Safari") {
+        self.appName = appName
+    }
+
+    public func startSession() async {
+        active = true
+    }
+
+    public func stopSession() async {
+        active = false
+    }
+
+    public func snapshot() async -> CursorSnapshot {
         CursorSnapshot(
             x: 0,
             y: 0,
-            frontmostApp: active ? "Safari" : "None"
+            frontmostApp: active ? appName : "None"
         )
     }
 }

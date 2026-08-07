@@ -14,21 +14,23 @@ Sensor → Context(Redactor) → Agent(PlanValidator) → Actions(gates) → Beh
 
 | Package | File(s) | Security job |
 | --- | --- | --- |
+| `Sensor` | `Sensor.swift` | `LocalSensor` (AppKit frontmost + mouse); `StubSensor` for CI |
 | `Context` | `packages/Context/.../Context.swift` | `Redactor` strips secret-looking strings from prefs/context |
-| `Behavior` | `Behavior.swift`, `Audit.swift` | `MemoryPolicy` + disk store + JSONL confirm receipts |
-| `Agent` | `Agent.swift`, `PlanGrade.swift`, `PlaybookGraph.swift` | `PlanValidator`, graph confirm-predecessor (spend/send/delete/auth), `PlanGrader` |
+| `Behavior` | `Behavior.swift`, `Audit.swift`, `Skill.swift` | `MemoryPolicy` on prefs **and** playbook/skill steps; JSONL receipts scrubbed |
+| `Agent` | `Agent.swift`, `PlanGrade.swift`, `PlaybookGraph.swift` | skill-first propose + `PlanValidator` + graph confirm-predecessor |
 | `Actions` | `packages/Actions/.../Actions.swift` | dry-run default; hard gates for spend/send/delete/auth |
-| Host | `apps/desktop/.../main.swift` | `policy`, `session`, `grade` CLIs |
+| Host | `apps/desktop/.../main.swift` | `session` TTY confirm; `grade` / skills CLIs |
 
 ## CLI surface
 
 ```bash
 swift run StealthDesktop policy          # print hard rules
-swift run StealthDesktop session         # dry-run (default)
-swift run StealthDesktop session --live --confirm
+swift run StealthDesktop session --assume-app Safari
+swift run StealthDesktop session --live --assume-app Safari   # TTY confirm
+swift run StealthDesktop session --live --confirm --assume-app Safari
+STEALTH_SENSOR=stub ./scripts/retention-eval.sh
 swift run StealthDesktop grade --self-test
-swift run StealthDesktop grade --file fixtures/plans/good-reorder.json
-./scripts/openclaw-reorder-dryrun.sh
+FIXTURES_ONLY=1 ./scripts/openclaw-reorder-dryrun.sh
 ```
 
 ## Fixtures (regression corpus)

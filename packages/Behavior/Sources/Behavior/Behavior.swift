@@ -48,21 +48,69 @@ public enum MemoryPolicy: Sendable {
         "password", "passwd", "sk-", "Bearer ", "cvv",
     ]
 
+    /// Intent to persist secrets inside free-text steps (playbooks / skills / audit).
+    private static let bannedStepSignals = [
+        "reuse password", "save password", "remember password", "store password",
+        "store token", "session cookie", "save login", "store credentials",
+        "login credentials", "remember credentials", "enter password",
+        "sk-", "Bearer ",
+    ]
+
     public static func validate(preference: Preference) -> Result<Preference, MemoryWriteError> {
         let key = preference.key.lowercased()
         if bannedKeyFragments.contains(where: { key.contains($0) }) {
             return .failure(.neverStoreKey(preference.key))
         }
-        let value = preference.value
-        if bannedValuePatterns.contains(where: { value.localizedCaseInsensitiveContains($0) }) {
-            return .failure(.neverStoreValue)
-        }
-        // Crude PAN-looking digit runs (13–19 digits)
-        let digits = value.filter(\.isNumber)
-        if digits.count >= 13 && digits.count <= 19 {
+        if containsSecretPayload(preference.value) {
             return .failure(.neverStoreValue)
         }
         return .success(preference)
+    }
+
+    public static func validate(playbook: Playbook) -> Result<Playbook, MemoryWriteError> {
+        switch validateSteps(playbook.steps + [playbook.name]) {
+        case .failure(let err):
+            return .failure(err)
+        case .success:
+            return .success(playbook)
+        }
+    }
+
+    public static func validate(skill: Skill) -> Result<Skill, MemoryWriteError> {
+        switch validateSteps(skill.steps + [skill.name, skill.trigger]) {
+        case .failure(let err):
+            return .failure(err)
+        case .success:
+            return .success(skill)
+        }
+    }
+
+    public static func validateSteps(_ steps: [String]) -> Result<[String], MemoryWriteError> {
+        for step in steps {
+            let lower = step.lowercased()
+            let negated = lower.contains("never password") || lower.contains("no password")
+                || lower.contains("never credential") || lower.contains("no credential")
+            if !negated && bannedStepSignals.contains(where: { lower.contains($0) }) {
+                return .failure(.neverStoreValue)
+            }
+            if containsSecretPayload(step) {
+                return .failure(.neverStoreValue)
+            }
+        }
+        return .success(steps)
+    }
+
+    private static func containsSecretPayload(_ value: String) -> Bool {
+        if bannedValuePatterns.contains(where: { value.localizedCaseInsensitiveContains($0) }) {
+            // Allow explicit "never passwords" policy language in steps/names.
+            let lower = value.lowercased()
+            if lower.contains("never password") || lower.contains("no password") {
+                return false
+            }
+            return true
+        }
+        let digits = value.filter(\.isNumber)
+        return digits.count >= 13 && digits.count <= 19
     }
 }
 
@@ -164,8 +212,22 @@ public actor BehaviorStore {
             }
         }
         preferences = kept
-        playbooks = snap.playbooks
-        skills = snap.skills
+        var keptBooks: [Playbook] = []
+        for book in snap.playbooks {
+            switch MemoryPolicy.validate(playbook: book) {
+            case .success(let ok): keptBooks.append(ok)
+            case .failure: dropped += 1
+            }
+        }
+        playbooks = keptBooks
+        var keptSkills: [Skill] = []
+        for skill in snap.skills {
+            switch MemoryPolicy.validate(skill: skill) {
+            case .success(let ok): keptSkills.append(ok)
+            case .failure: dropped += 1
+            }
+        }
+        skills = keptSkills
         if dropped > 0 {
             try persist()
         }
@@ -198,7 +260,8 @@ public actor BehaviorStore {
 
     /// Only call after a confirmed successful run.
     public func save(playbook: Playbook) throws {
-        playbooks.append(playbook)
+        let validated = try MemoryPolicy.validate(playbook: playbook).get()
+        playbooks.append(validated)
         try persist()
     }
 
@@ -208,10 +271,11 @@ public actor BehaviorStore {
 
     /// Save or replace a skill by trigger (continual learning artifact).
     public func upsert(skill: Skill) throws {
-        if let idx = skills.firstIndex(where: { $0.trigger.lowercased() == skill.trigger.lowercased() }) {
-            skills[idx] = skill
+        let validated = try MemoryPolicy.validate(skill: skill).get()
+        if let idx = skills.firstIndex(where: { $0.trigger.lowercased() == validated.trigger.lowercased() }) {
+            skills[idx] = validated
         } else {
-            skills.append(skill)
+            skills.append(validated)
         }
         try persist()
     }

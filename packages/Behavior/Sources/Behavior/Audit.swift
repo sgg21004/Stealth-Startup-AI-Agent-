@@ -80,7 +80,19 @@ public actor AuditLog {
 
     public func append(_ receipt: ConfirmReceipt) throws {
         guard let fileURL else { return }
-        var data = try encoder.encode(receipt)
+        // Keep the trail, but never persist secret-looking step/title payloads.
+        let safe = ConfirmReceipt(
+            id: receipt.id,
+            at: receipt.at,
+            mode: receipt.mode,
+            outcome: receipt.outcome,
+            title: scrubText(receipt.title),
+            risk: receipt.risk,
+            steps: receipt.steps.map(scrubText),
+            userConfirmed: receipt.userConfirmed,
+            detail: receipt.detail.map(scrubText)
+        )
+        var data = try encoder.encode(safe)
         data.append(contentsOf: [UInt8(ascii: "\n")])
         if FileManager.default.fileExists(atPath: fileURL.path) {
             let handle = try FileHandle(forWritingTo: fileURL)
@@ -90,6 +102,13 @@ public actor AuditLog {
         } else {
             try data.write(to: fileURL, options: [.atomic])
         }
+    }
+
+    private func scrubText(_ text: String) -> String {
+        if case .failure = MemoryPolicy.validateSteps([text]) {
+            return "[REDACTED]"
+        }
+        return text
     }
 
     public func recent(limit: Int = 20) throws -> [ConfirmReceipt] {

@@ -18,11 +18,14 @@ public struct ProposedAction: Sendable, Equatable {
     public var steps: [String]
     public var risk: ActionRisk
     public var needsConfirm: Bool
+    /// `heuristic` or `skill:<name>` — proves continual learning changed the plan.
+    public var origin: String
 
-    public init(title: String, steps: [String], risk: ActionRisk) {
+    public init(title: String, steps: [String], risk: ActionRisk, origin: String = "heuristic") {
         self.title = title
         self.steps = steps
         self.risk = risk
+        self.origin = origin
         switch risk {
         case .spend, .send, .delete, .auth, .fill, .navigate:
             self.needsConfirm = true
@@ -118,12 +121,29 @@ public enum PlanValidator: Sendable {
 public struct AgentBrain: Sendable {
     public init() {}
 
-    /// Heuristic reorder proposal (cloud planner later). Always includes spend confirm.
-    public func propose(from pack: ContextPack, preferences: [Preference]) -> Result<ProposedAction, PlanValidationError> {
+    /// Prefer retrieved skill cards (validated); else heuristic reorder. Planners stay untrusted.
+    public func propose(
+        from pack: ContextPack,
+        preferences: [Preference],
+        skills: [Skill] = []
+    ) -> Result<ProposedAction, PlanValidationError> {
         let looksLikeBrowser = ["Safari", "Chrome", "Arc", "Firefox", "Brave"]
             .contains(where: { pack.app.localizedCaseInsensitiveContains($0) })
         guard looksLikeBrowser else {
             return .failure(.emptyPlan)
+        }
+
+        for skill in skills where !skill.steps.isEmpty {
+            let risk = ActionRisk(rawValue: skill.risk) ?? .spend
+            let fromSkill = ProposedAction(
+                title: skill.name,
+                steps: skill.steps,
+                risk: risk,
+                origin: "skill:\(skill.name)"
+            )
+            if case .success(let ok) = PlanValidator.validate(fromSkill) {
+                return .success(ok)
+            }
         }
 
         let vendor = preferences.first(where: { $0.key == "preferred_vendor" })?.value ?? "usual store"
@@ -134,7 +154,8 @@ public struct AgentBrain: Sendable {
                 "Apply saved prefs (never passwords)",
                 "Pause before payment for confirm",
             ],
-            risk: .spend
+            risk: .spend,
+            origin: "heuristic"
         )
         return PlanValidator.validate(proposal)
     }
