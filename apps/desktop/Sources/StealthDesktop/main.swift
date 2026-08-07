@@ -11,7 +11,7 @@ struct StealthDesktop: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "StealthDesktop",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
-        subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self, Audit.self]
+        subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self, Audit.self, Skills.self]
     )
 }
 
@@ -40,8 +40,10 @@ struct Status: AsyncParsableCommand {
         print("memory.path: \(url.path)")
         print("memory.prefs: \(snap.preferences.count)")
         print("memory.playbooks: \(snap.playbooks.count)")
+        print("memory.skills: \(snap.skills.count)")
         print("audit.path: \(auditURL.path)")
         print("audit.receipts: \(auditCount)")
+        print("continual-learning: docs/eng/continual-learning.md")
     }
 }
 
@@ -131,12 +133,16 @@ struct Memory: AsyncParsableCommand {
             for pb in snap.playbooks {
                 print("  - \(pb.name) (\(pb.steps.count) steps)")
             }
+            print("skills: \(snap.skills.count)")
+            for s in snap.skills {
+                print("  - \(s.name) trigger=\(s.trigger) ~\(s.approxTokens) tok")
+            }
         }
     }
 
     struct Reset: AsyncParsableCommand {
         static let configuration = CommandConfiguration(
-            abstract: "Wipe on-device prefs + playbooks."
+            abstract: "Wipe on-device prefs + playbooks + skills."
         )
 
         func run() async throws {
@@ -261,6 +267,99 @@ struct Grade: ParsableCommand {
     }
 }
 
+struct Skills: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "skills",
+        abstract: "Cross-session skill cards (continual learning).",
+        subcommands: [List.self, Add.self, RetainCheck.self]
+    )
+
+    struct List: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Print skill cards from disk."
+        )
+
+        func run() async throws {
+            let url = try BehaviorPaths.defaultStoreURL()
+            let store = BehaviorStore(fileURL: url)
+            try await store.load()
+            let skills = await store.allSkills()
+            print("path: \(url.path)")
+            print("skills: \(skills.count)")
+            for s in skills {
+                print("---")
+                print(s.contextCard())
+                print("approx_tokens: \(s.approxTokens)")
+            }
+        }
+    }
+
+    struct Add: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Add a skill card (research / second-task demos)."
+        )
+
+        @Option(name: .long, help: "Skill name.")
+        var name: String
+
+        @Option(name: .long, help: "Trigger string used for retrieve.")
+        var trigger: String
+
+        @Option(name: .long, help: "Risk class string (default: spend).")
+        var risk: String = "spend"
+
+        @Option(name: .long, parsing: .singleValue, help: "Step (repeat flag for multiple).")
+        var step: [String]
+
+        func run() async throws {
+            guard !step.isEmpty else {
+                throw ValidationError("Pass at least one --step")
+            }
+            let url = try BehaviorPaths.defaultStoreURL()
+            let store = BehaviorStore(fileURL: url)
+            try await store.load()
+            let skill = Skill(name: name, trigger: trigger, steps: step, risk: risk)
+            try await store.upsert(skill: skill)
+            print("skills: saved '\(skill.name)' trigger=\(skill.trigger) ~\(skill.approxTokens) tok")
+            print("path: \(url.path)")
+        }
+    }
+
+    struct RetainCheck: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Check that listed triggers still retrieve (A then B retention)."
+        )
+
+        @Option(name: .long, parsing: .singleValue, help: "Trigger to retrieve (repeat).")
+        var trigger: [String]
+
+        func run() async throws {
+            guard !trigger.isEmpty else {
+                throw ValidationError("Pass at least one --trigger")
+            }
+            let url = try BehaviorPaths.defaultStoreURL()
+            let store = BehaviorStore(fileURL: url)
+            try await store.load()
+            var failed = false
+            for t in trigger {
+                let hits = await store.matchingSkills(query: t, limit: 3)
+                let ok = !hits.isEmpty
+                print("retain: trigger=\(t) hits=\(hits.count) \(ok ? "PASS" : "FAIL")")
+                for h in hits {
+                    print("  - \(h.name) ~\(h.approxTokens) tok")
+                }
+                if !ok { failed = true }
+            }
+            let all = await store.allSkills()
+            print("skills.total: \(all.count)")
+            if failed {
+                throw ExitCode(2)
+            }
+            print("retain-check: PASS")
+        }
+    }
+}
+
 struct Session: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "Run one opt-in attention session (dry-run by default)."
@@ -312,11 +411,25 @@ struct Session: AsyncParsableCommand {
 
         let snapshot = await sensor.snapshot()
         let prefs = await store.allPreferences()
-        let pack = assembler.assemble(from: snapshot, prefsHints: prefs.map(\.value))
+        let vendor = prefs.first(where: { $0.key == "preferred_vendor" })?.value ?? "reorder"
+        // Continual learning: retrieve skill cards for this process — no prior chat history.
+        let matched = await store.matchingSkills(query: vendor, limit: 3)
+        let cards = matched.map { $0.contextCard() }
+        let tok = matched.reduce(0) { $0 + $1.approxTokens }
+        let pack = assembler.assemble(
+            from: snapshot,
+            prefsHints: prefs.map(\.value),
+            skillCards: cards,
+            skillTokensApprox: tok
+        )
 
         print("session:on app=\(pack.app) mode=\(live ? "live" : "dry-run")")
         print("context: \(pack.summary)")
         print("memory.prefs: \(prefs.count)")
+        print("skills.retrieved: \(matched.count) approx_tokens=\(tok) (not chat history)")
+        for s in matched {
+            print("skills.hit: \(s.name) trigger=\(s.trigger)")
+        }
 
         let proposal: ProposedAction
         switch brain.propose(from: pack, preferences: prefs) {
@@ -379,7 +492,14 @@ struct Session: AsyncParsableCommand {
             )
         case .confirmedAndRecorded(let playbook):
             try await store.save(playbook: playbook)
+            let skill = SkillDistiller.distill(
+                playbook: playbook,
+                trigger: vendor,
+                risk: proposal.risk.rawValue
+            )
+            try await store.upsert(skill: skill)
             print("outcome: recorded playbook '\(playbook.name)' (\(playbook.steps.count) steps)")
+            print("skills: saved '\(skill.name)' trigger=\(skill.trigger) ~\(skill.approxTokens) tok")
             print("memory: persisted")
             try await audit.append(
                 ConfirmReceipt(
@@ -389,7 +509,7 @@ struct Session: AsyncParsableCommand {
                     risk: proposal.risk.rawValue,
                     steps: proposal.steps,
                     userConfirmed: confirm,
-                    detail: "playbook:\(playbook.id)"
+                    detail: "playbook:\(playbook.id);skill:\(skill.id)"
                 )
             )
             print("audit: receipt written")

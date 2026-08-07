@@ -9,7 +9,11 @@ Last updated: 2026-08-07
 - Security runtime: redaction, never-store memory, plan validation, dry-run default, spend confirm
 - **On-disk Behavior store** at `~/Library/Application Support/StealthStartup/behavior.json`
 - **Confirm receipts** at `~/Library/Application Support/StealthStartup/audit.jsonl`
+- **Skill cards** for cross-session continual learning (no chat history stuffing)
+- Retention eval A→B→A: `scripts/retention-eval.sh`
 - OpenClaw reorder dry-run → JSON → `PlanGrader` loop
+- Research note: `docs/eng/continual-learning.md`
+- Full links: `docs/eng/reading-list-links.md`
 - GitHub remote: `sgg21004/Stealth-Startup-AI-Agent-` (local: `~/Projects/stealth-startup`)
 
 ## What does not exist yet

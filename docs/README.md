@@ -10,7 +10,8 @@ Reorder on macOS is the proving ground — not the whole company.
 | 1 | [eng/security-memory.md](eng/security-memory.md) | **Law** — never-store, confirm gates, memory rules |
 | 2 | [eng/security-research.md](eng/security-research.md) | **Research** — threat agenda, scrutiny loop, open questions |
 | 3 | [eng/security-code-map.md](eng/security-code-map.md) | **Where it lives in code** + how to grade plans |
-
+| 4 | [eng/continual-learning.md](eng/continual-learning.md) | **Cross-session skills** + lab reading curriculum |
+| 5 | [eng/reading-list-links.md](eng/reading-list-links.md) | **Every link** (Weeks 1–6) |
 ## Company
 
 | Doc | Path |

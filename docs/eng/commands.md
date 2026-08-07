@@ -32,6 +32,14 @@ swift run StealthDesktop memory reset
 swift run StealthDesktop audit show
 swift run StealthDesktop audit reset
 
+# cross-session skill cards (continual learning)
+swift run StealthDesktop skills list
+./scripts/cross-session-skills.sh
+./scripts/retention-eval.sh   # learn A → learn B → A still works
+
+# reading links
+# docs/eng/reading-list-links.md
+
 # optional overrides for tests
 # STEALTH_BEHAVIOR_PATH=/tmp/behavior.json STEALTH_AUDIT_PATH=/tmp/audit.jsonl \
 #   swift run StealthDesktop session --live --confirm

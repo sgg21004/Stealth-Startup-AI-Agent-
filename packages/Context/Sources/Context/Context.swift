@@ -7,12 +7,24 @@ public struct ContextPack: Sendable, Equatable {
     public var summary: String
     public var cursor: CursorSnapshot
     public var prefsHints: [String]
+    /// Retrieved skill cards (continual learning) — not full chat history.
+    public var skillCards: [String]
+    public var skillTokensApprox: Int
 
-    public init(app: String, summary: String, cursor: CursorSnapshot, prefsHints: [String] = []) {
+    public init(
+        app: String,
+        summary: String,
+        cursor: CursorSnapshot,
+        prefsHints: [String] = [],
+        skillCards: [String] = [],
+        skillTokensApprox: Int = 0
+    ) {
         self.app = app
         self.summary = summary
         self.cursor = cursor
         self.prefsHints = prefsHints
+        self.skillCards = skillCards
+        self.skillTokensApprox = skillTokensApprox
     }
 }
 
@@ -43,13 +55,21 @@ public enum Redactor: Sendable {
 public struct ContextAssembler: Sendable {
     public init() {}
 
-    public func assemble(from snapshot: CursorSnapshot, prefsHints: [String] = []) -> ContextPack {
+    public func assemble(
+        from snapshot: CursorSnapshot,
+        prefsHints: [String] = [],
+        skillCards: [String] = [],
+        skillTokensApprox: Int = 0
+    ) -> ContextPack {
         let safeHints = Redactor.redactAll(prefsHints)
+        let safeSkills = Redactor.redactAll(skillCards)
         return ContextPack(
             app: snapshot.frontmostApp,
             summary: "Focus on \(snapshot.frontmostApp) near cursor (\(Int(snapshot.x)), \(Int(snapshot.y)))",
             cursor: snapshot,
-            prefsHints: safeHints
+            prefsHints: safeHints,
+            skillCards: safeSkills,
+            skillTokensApprox: skillTokensApprox
         )
     }
 }

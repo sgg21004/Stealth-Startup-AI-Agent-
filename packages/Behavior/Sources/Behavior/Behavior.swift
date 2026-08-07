@@ -71,20 +71,32 @@ public struct BehaviorSnapshot: Sendable, Codable, Equatable {
     public var version: Int
     public var preferences: [Preference]
     public var playbooks: [Playbook]
+    public var skills: [Skill]
     public var updatedAt: Date
 
-    public static let currentVersion = 1
+    public static let currentVersion = 2
 
     public init(
         version: Int = BehaviorSnapshot.currentVersion,
         preferences: [Preference] = [],
         playbooks: [Playbook] = [],
+        skills: [Skill] = [],
         updatedAt: Date = Date()
     ) {
         self.version = version
         self.preferences = preferences
         self.playbooks = playbooks
+        self.skills = skills
         self.updatedAt = updatedAt
+    }
+
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        version = try c.decodeIfPresent(Int.self, forKey: .version) ?? 1
+        preferences = try c.decodeIfPresent([Preference].self, forKey: .preferences) ?? []
+        playbooks = try c.decodeIfPresent([Playbook].self, forKey: .playbooks) ?? []
+        skills = try c.decodeIfPresent([Skill].self, forKey: .skills) ?? []
+        updatedAt = try c.decodeIfPresent(Date.self, forKey: .updatedAt) ?? Date()
     }
 }
 
@@ -111,10 +123,11 @@ public enum BehaviorPaths: Sendable {
     }
 }
 
-/// On-device store for prefs + playbooks. Enforces never-store on write and load.
+/// On-device store for prefs, playbooks, and cross-session skills.
 public actor BehaviorStore {
     private var preferences: [Preference] = []
     private var playbooks: [Playbook] = []
+    private var skills: [Skill] = []
     private let fileURL: URL?
     private let encoder: JSONEncoder
     private let decoder: JSONDecoder
@@ -135,6 +148,7 @@ public actor BehaviorStore {
         guard FileManager.default.fileExists(atPath: fileURL.path) else {
             preferences = []
             playbooks = []
+            skills = []
             return
         }
         let data = try Data(contentsOf: fileURL)
@@ -151,6 +165,7 @@ public actor BehaviorStore {
         }
         preferences = kept
         playbooks = snap.playbooks
+        skills = snap.skills
         if dropped > 0 {
             try persist()
         }
@@ -191,14 +206,45 @@ public actor BehaviorStore {
         playbooks
     }
 
+    /// Save or replace a skill by trigger (continual learning artifact).
+    public func upsert(skill: Skill) throws {
+        if let idx = skills.firstIndex(where: { $0.trigger.lowercased() == skill.trigger.lowercased() }) {
+            skills[idx] = skill
+        } else {
+            skills.append(skill)
+        }
+        try persist()
+    }
+
+    public func allSkills() -> [Skill] {
+        skills
+    }
+
+    /// Retrieve skills without stuffing chat history — substring match on trigger/name.
+    public func matchingSkills(query: String, limit: Int = 3) -> [Skill] {
+        let q = query.lowercased()
+        let hits = skills.filter {
+            $0.trigger.lowercased().contains(q)
+                || $0.name.lowercased().contains(q)
+                || q.contains($0.trigger.lowercased())
+        }
+        return Array(hits.prefix(limit))
+    }
+
     public func reset() throws {
         preferences = []
         playbooks = []
+        skills = []
         try persist()
     }
 
     public func snapshot() -> BehaviorSnapshot {
-        BehaviorSnapshot(preferences: preferences, playbooks: playbooks, updatedAt: Date())
+        BehaviorSnapshot(
+            preferences: preferences,
+            playbooks: playbooks,
+            skills: skills,
+            updatedAt: Date()
+        )
     }
 
     private func persist() throws {
@@ -206,6 +252,7 @@ public actor BehaviorStore {
         let snap = BehaviorSnapshot(
             preferences: preferences,
             playbooks: playbooks,
+            skills: skills,
             updatedAt: Date()
         )
         let data = try encoder.encode(snap)
