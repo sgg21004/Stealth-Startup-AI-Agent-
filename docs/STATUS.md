@@ -8,6 +8,7 @@ Last updated: 2026-08-07
 - SwiftPM monorepo: Sensor, Context, Agent, Actions, Behavior + `StealthDesktop` CLI
 - Security runtime: redaction, never-store memory, plan validation, dry-run default, spend confirm
 - **On-disk Behavior store** at `~/Library/Application Support/StealthStartup/behavior.json`
+- **Confirm receipts** at `~/Library/Application Support/StealthStartup/audit.jsonl`
 - OpenClaw reorder dry-run → JSON → `PlanGrader` loop
 - GitHub remote: `sgg21004/Stealth-Startup-AI-Agent-` (local: `~/Projects/stealth-startup`)
 
@@ -27,7 +28,7 @@ Last updated: 2026-08-07
 
 1. Formal playbook graph where spend requires a confirm node
 2. More adversarial fixtures from real OpenClaw fails
-3. Confirm receipts / audit log for live runs
+3. Encrypted-at-rest for memory + audit
 4. Xcode app + real sensor only after policy feels boringly solid
 
 ## Writing

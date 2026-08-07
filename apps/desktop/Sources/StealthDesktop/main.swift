@@ -11,7 +11,7 @@ struct StealthDesktop: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         commandName: "StealthDesktop",
         abstract: "macOS cursor agent host (CLI stub until Xcode app target lands).",
-        subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self]
+        subcommands: [Session.self, Status.self, Policy.self, Grade.self, Memory.self, Audit.self]
     )
 }
 
@@ -33,9 +33,15 @@ struct Status: AsyncParsableCommand {
         print("sensing: hotkey session (stub)")
         print("policy: security-memory enforced in Behavior/Agent/Actions")
         print("default session mode: dry-run")
+        let auditURL = try AuditPaths.defaultAuditURL()
+        let audit = AuditLog(fileURL: auditURL)
+        let auditCount = try await audit.count()
+
         print("memory.path: \(url.path)")
         print("memory.prefs: \(snap.preferences.count)")
         print("memory.playbooks: \(snap.playbooks.count)")
+        print("audit.path: \(auditURL.path)")
+        print("audit.receipts: \(auditCount)")
     }
 }
 
@@ -49,8 +55,53 @@ struct Policy: ParsableCommand {
         print("always-confirm: spend, send, delete, auth")
         print("memory: on-device prefs/playbooks after confirmed success only")
         print("memory.path: ~/Library/Application Support/StealthStartup/behavior.json")
+        print("audit.path: ~/Library/Application Support/StealthStartup/audit.jsonl")
         print("planners: untrusted (OpenClaw/cloud); runtime grades plans")
         print("doc: docs/eng/security-memory.md")
+    }
+}
+
+struct Audit: AsyncParsableCommand {
+    static let configuration = CommandConfiguration(
+        commandName: "audit",
+        abstract: "Inspect confirm receipts (scrutiny trail).",
+        subcommands: [Show.self, Reset.self]
+    )
+
+    struct Show: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Print recent confirm receipts."
+        )
+
+        @Option(name: .long, help: "Max receipts to show.")
+        var limit: Int = 20
+
+        func run() async throws {
+            let url = try AuditPaths.defaultAuditURL()
+            let log = AuditLog(fileURL: url)
+            let rows = try await log.recent(limit: limit)
+            print("path: \(url.path)")
+            print("showing: \(rows.count)")
+            for r in rows {
+                let detail = r.detail.map { " detail=\($0)" } ?? ""
+                print(
+                    "- \(r.at) mode=\(r.mode) outcome=\(r.outcome) risk=\(r.risk) confirmed=\(r.userConfirmed) title=\(r.title)\(detail)"
+                )
+            }
+        }
+    }
+
+    struct Reset: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(
+            abstract: "Wipe audit.jsonl."
+        )
+
+        func run() async throws {
+            let url = try AuditPaths.defaultAuditURL()
+            let log = AuditLog(fileURL: url)
+            try await log.reset()
+            print("audit: reset \(url.path)")
+        }
     }
 }
 
@@ -232,6 +283,10 @@ struct Session: AsyncParsableCommand {
         try await store.load()
         print("memory: loaded \(url.path)")
 
+        let auditURL = try AuditPaths.defaultAuditURL()
+        let audit = AuditLog(fileURL: auditURL)
+        print("audit: \(auditURL.path)")
+
         // Seed vendor pref if missing (allowed)
         if await store.allPreferences().contains(where: { $0.key == "preferred_vendor" }) == false {
             _ = try await store.upsert(
@@ -293,17 +348,65 @@ struct Session: AsyncParsableCommand {
             dryRun: !live
         )
 
+        let mode = live ? "live" : "dry-run"
         switch outcome {
         case .denied(let reason):
             print("outcome: denied (\(reason))")
+            try await audit.append(
+                ConfirmReceipt(
+                    mode: mode,
+                    outcome: "denied",
+                    title: proposal.title,
+                    risk: proposal.risk.rawValue,
+                    steps: proposal.steps,
+                    userConfirmed: confirm,
+                    detail: reason
+                )
+            )
+            print("audit: receipt written")
         case .dryRun(let steps):
             print("outcome: dry-run \(steps.count) steps (pass --live --confirm to record)")
+            try await audit.append(
+                ConfirmReceipt(
+                    mode: mode,
+                    outcome: "dry-run",
+                    title: proposal.title,
+                    risk: proposal.risk.rawValue,
+                    steps: steps,
+                    userConfirmed: false,
+                    detail: nil
+                )
+            )
         case .confirmedAndRecorded(let playbook):
             try await store.save(playbook: playbook)
             print("outcome: recorded playbook '\(playbook.name)' (\(playbook.steps.count) steps)")
             print("memory: persisted")
+            try await audit.append(
+                ConfirmReceipt(
+                    mode: mode,
+                    outcome: "confirmed",
+                    title: proposal.title,
+                    risk: proposal.risk.rawValue,
+                    steps: proposal.steps,
+                    userConfirmed: confirm,
+                    detail: "playbook:\(playbook.id)"
+                )
+            )
+            print("audit: receipt written")
         case .policyRejected(let reason):
             print("outcome: policy-rejected (\(reason))")
+            try await audit.append(
+                ConfirmReceipt(
+                    mode: mode,
+                    outcome: "policy-rejected",
+                    title: proposal.title,
+                    risk: proposal.risk.rawValue,
+                    steps: proposal.steps,
+                    userConfirmed: confirm,
+                    detail: reason
+                )
+            )
+            print("audit: receipt written")
         }
     }
 }

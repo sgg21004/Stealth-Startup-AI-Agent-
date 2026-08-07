@@ -8,3 +8,4 @@ swift run StealthDesktop policy
 swift run StealthDesktop session
 swift run StealthDesktop session --live --confirm
 swift run StealthDesktop memory show
+swift run StealthDesktop audit show --limit 5

@@ -28,8 +28,13 @@ swift run StealthDesktop session --live --confirm
 swift run StealthDesktop memory show
 swift run StealthDesktop memory reset
 
-# optional override for tests
-# STEALTH_BEHAVIOR_PATH=/tmp/behavior.json swift run StealthDesktop memory show
+# confirm receipts / audit trail (audit.jsonl)
+swift run StealthDesktop audit show
+swift run StealthDesktop audit reset
+
+# optional overrides for tests
+# STEALTH_BEHAVIOR_PATH=/tmp/behavior.json STEALTH_AUDIT_PATH=/tmp/audit.jsonl \
+#   swift run StealthDesktop session --live --confirm
 
 # grade planner JSON (policy scrutiny)
 swift run StealthDesktop grade --self-test

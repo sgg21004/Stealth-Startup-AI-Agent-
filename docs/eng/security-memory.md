@@ -98,8 +98,8 @@ swift run StealthDesktop grade --file path/to/plan.json
 - [x] CLI `grade` + OpenClaw grader script
 - [x] Security research + code-map docs
 - [x] Persist Behavior store to disk (`~/Library/Application Support/StealthStartup/behavior.json`)
-- [ ] Encrypted-at-rest for Behavior store
-- [ ] Confirm receipts / audit log
+- [x] Confirm receipts / audit log (`audit.jsonl`)
+- [ ] Encrypted-at-rest for Behavior store + audit
 - [ ] Structural playbook graph (spend node requires confirm predecessor)
 - [ ] Full Xcode test target enabled
 
