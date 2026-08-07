@@ -99,8 +99,8 @@ swift run StealthDesktop grade --file path/to/plan.json
 - [x] Security research + code-map docs
 - [x] Persist Behavior store to disk (`~/Library/Application Support/StealthStartup/behavior.json`)
 - [x] Confirm receipts / audit log (`audit.jsonl`)
+- [x] Structural playbook graph (spend/send/delete/auth require confirm predecessor)
 - [ ] Encrypted-at-rest for Behavior store + audit
-- [ ] Structural playbook graph (spend node requires confirm predecessor)
 - [ ] Full Xcode test target enabled
 
 ## Related

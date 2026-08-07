@@ -18,3 +18,4 @@ Dated locks. Newer wins if conflict.
 | 2026-08-06 | Never store credentials or raw payment secrets | Prefs/playbooks only after confirm; on-device |
 | 2026-08-06 | Security is the primary research/product surface | Docs hub leads with security; reorder is proving ground |
 | 2026-08-06 | Prompt-only safety is rejected | All critical gates enforced in Swift runtime + grader |
+| 2026-08-07 | Playbook graph confirm-predecessor | Confirm *after* spend is invalid even if the word “confirm” appears |

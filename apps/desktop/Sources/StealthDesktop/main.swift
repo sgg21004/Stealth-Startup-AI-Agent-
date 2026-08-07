@@ -227,6 +227,16 @@ struct Grade: ParsableCommand {
             risk: .observe,
             prefsToRemember: []
         )
+        let badConfirmAfterSpend = PlanDraft(
+            title: "Checkout then maybe confirm",
+            steps: [
+                "Open cart",
+                "Place order and pay",
+                "Confirm the receipt was emailed",
+            ],
+            risk: .spend,
+            prefsToRemember: []
+        )
 
         var failed = false
         let cases: [(String, PlanDraft, Bool)] = [
@@ -235,6 +245,7 @@ struct Grade: ParsableCommand {
             ("bad-no-confirm", badNoConfirm, false),
             ("bad-theater", badTheater, false),
             ("bad-always-on", badAlwaysOn, false),
+            ("bad-confirm-after-spend", badConfirmAfterSpend, false),
         ]
 
         for (name, draft, shouldPass) in cases {

@@ -30,10 +30,9 @@ Last updated: 2026-08-07
 
 ## Next eng slices
 
-1. Formal playbook graph where spend requires a confirm node
-2. More adversarial fixtures from real OpenClaw fails
-3. Encrypted-at-rest for memory + audit
-4. Xcode app + real sensor only after policy feels boringly solid
+1. More adversarial fixtures from real OpenClaw fails
+2. Encrypted-at-rest for memory + audit
+3. Xcode app + real sensor only after policy feels boringly solid
 
 ## Writing
 

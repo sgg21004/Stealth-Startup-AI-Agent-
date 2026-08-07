@@ -12,6 +12,7 @@
 - [x] Skill cards + cross-session retrieve (`skills list`, `cross-session-skills.sh`)
 - [x] Retention eval A→B→A (`scripts/retention-eval.sh`)
 - [x] Lab reading links file (`docs/eng/reading-list-links.md`)
+- [x] Playbook graph: irreversible steps need confirm predecessor
 - [ ] Install full Xcode (needed for real `.app` + Accessibility entitlements)
 - [ ] Wire real cursor/focus sensor (Accessibility)
 - [ ] Minimal confirm UI (native overlay or CLI confirm → then overlay)

@@ -1,0 +1,10 @@
+{
+  "title": "Checkout then maybe confirm",
+  "steps": [
+    "Open cart",
+    "Place order and pay",
+    "Confirm the receipt was emailed"
+  ],
+  "risk": "spend",
+  "prefs_to_remember": []
+}

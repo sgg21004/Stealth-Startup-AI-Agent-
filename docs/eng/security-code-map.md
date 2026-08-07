@@ -16,7 +16,7 @@ Sensor → Context(Redactor) → Agent(PlanValidator) → Actions(gates) → Beh
 | --- | --- | --- |
 | `Context` | `packages/Context/.../Context.swift` | `Redactor` strips secret-looking strings from prefs/context |
 | `Behavior` | `Behavior.swift`, `Audit.swift` | `MemoryPolicy` + disk store + JSONL confirm receipts |
-| `Agent` | `Agent.swift`, `PlanGrade.swift` | `PlanValidator`, `PlanGrader`, risk classes, confirm requirements |
+| `Agent` | `Agent.swift`, `PlanGrade.swift`, `PlaybookGraph.swift` | `PlanValidator`, graph confirm-predecessor (spend/send/delete/auth), `PlanGrader` |
 | `Actions` | `packages/Actions/.../Actions.swift` | dry-run default; hard gates for spend/send/delete/auth |
 | Host | `apps/desktop/.../main.swift` | `policy`, `session`, `grade` CLIs |
 
@@ -43,6 +43,8 @@ swift run StealthDesktop grade --file fixtures/plans/good-reorder.json
 | `bad-always-on.json` | FAIL |
 | `bad-card-memory.json` | FAIL |
 | `bad-store-token.json` | FAIL |
+| `bad-confirm-after-spend.json` | FAIL (confirm after pay — graph) |
+| `good-graph-reorder.json` | PASS |
 
 Add a new fixture whenever a real model fails in a new way.
 

@@ -37,6 +37,7 @@ public enum PlanValidationError: Error, Sendable, Equatable, CustomStringConvert
     case credentialMemoryRequested
     case confirmTheater
     case alwaysOnCapture
+    case graphInvalid(String)
     case emptyPlan
 
     public var description: String {
@@ -49,6 +50,8 @@ public enum PlanValidationError: Error, Sendable, Equatable, CustomStringConvert
             return "reject: plan claims confirmation is unnecessary for spend/side effects"
         case .alwaysOnCapture:
             return "reject: plan requests always-on / continuous screen capture"
+        case .graphInvalid(let detail):
+            return detail
         case .emptyPlan:
             return "reject: empty plan"
         }
@@ -100,6 +103,12 @@ public enum PlanValidator: Sendable {
             if !hasConfirm || !proposal.needsConfirm {
                 return .failure(.missingSpendConfirm)
             }
+        }
+
+        // Structural gate: irreversible nodes need a confirm *predecessor* (not after).
+        let graph = PlaybookGraphBuilder.linear(from: proposal.steps)
+        if case .failure(let err) = PlaybookGraphValidator.validate(graph) {
+            return .failure(.graphInvalid(err.description))
         }
 
         return .success(proposal)
